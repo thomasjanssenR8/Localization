@@ -41,22 +41,22 @@ class Localization:
         print(r.text)  # print string
         return r
 
-    def decodeObject(self, r):
+    def decodeObject(self, r):  #@TODO: meerdere coordinaten opslaan in array of list
         data = r.json()
-        param1 = data["success"]
-        param2 = data["error"]
-        print(param1)
-        print(param2)
-        position = [param1, param2]
+        resultCount = data["resultCount"]
+        print("ResultCount = " + str(resultCount))
+        results = data["results"]
+        trilat = results[0]["trilat"]
+        print("Latitude = " + str(trilat))
+        trilong = results[0]["trilong"]
+        print("Longitude = " + str(trilong))
+        position = [trilat, trilong]
 
-        # resultCount = data["resultCount"]
-        # print("ResultCount = " + str(resultCount))
-        # results = data["results"]
-        # trilat = results[0]["trilat"]
-        # print("Latitude = " + str(trilat))
-        # trilong = results[0]["trilong"]
-        # print("Longitude = " + str(trilong))
-        # position = [trilat, trilong]
+        # param1 = data["success"]  # Use this in case daily limit of requests is reached
+        # param2 = data["error"]
+        # print(param1)
+        # print(param2)
+        # position = [param1, param2]
 
         return position
 
@@ -75,19 +75,19 @@ position = l.decodeObject(request)  # response unmarshalling (this function also
 
 
 
-# Temporary data (daily limited amount of requests!)
-data = '{"resultCount":1,"last":1,"success":true,"results":[{"trilat":51.22378540,"trilong":4.40892172,"ssid":"UAntwerpen","qos":7,"transid":"20120419-00187","firsttime":"2012-04-19T23:05:18.000Z","lasttime":"2015-02-22T11:26:18.000Z","lastupdt":"2015-02-22T09:28:02.000Z","netid":"00:0B:86:26:79:C5","name":null,"type":"infra","comment":null,"wep":"2","channel":6,"bcninterval":0,"freenet":"?","dhcp":"?","paynet":"?","userfound":false}],"first":1}'
+# Use this in case daily limit of requests is reached:
+# data = '{"resultCount":1,"last":1,"success":true,"results":[{"trilat":51.22378540,"trilong":4.40892172,"ssid":"UAntwerpen","qos":7,"transid":"20120419-00187","firsttime":"2012-04-19T23:05:18.000Z","lasttime":"2015-02-22T11:26:18.000Z","lastupdt":"2015-02-22T09:28:02.000Z","netid":"00:0B:86:26:79:C5","name":null,"type":"infra","comment":null,"wep":"2","channel":6,"bcninterval":0,"freenet":"?","dhcp":"?","paynet":"?","userfound":false}],"first":1}'
+#
+# latitude_index = data.find("trilat") + 8
+# latitude = data[latitude_index: (latitude_index+11)]
+# print("N"+latitude)
+#
+# longitude_index = data.find("trilong") + 9
+# longitude = data[longitude_index: (longitude_index+10)]
+# print("E"+longitude)
 
-latitude_index = data.find("trilat") + 8
-latitude = data[latitude_index: (latitude_index+11)]
-print("N"+latitude)
 
-longitude_index = data.find("trilong") + 9
-longitude = data[longitude_index: (longitude_index+10)]
-print("E"+longitude)
-
-
-# import scatter
+# import scatter:
 # s = scatter()
 # s.addCoordinate(51.22378540, 4.40892172)  # Coordinates from wigle request with ssid=Uantwerpen (stadscampus)
 # s.addCoordinate(51.22327042, 4.40893793)
