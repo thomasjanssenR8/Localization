@@ -4,7 +4,8 @@ Draw a scatter plot with the data obtained by the http request, based on latitud
 import numpy as np
 import matplotlib.pyplot as plt
 
-class coordinate:
+
+class Coordinate:
     latitude = ""
     longitude = ""
 
@@ -19,11 +20,12 @@ class coordinate:
     def printCoordinate(self):
         print("Coordinate: latitude = " + str(self.latitude) + ", longitude = " + str(self.longitude))
 
-class scatter:
+
+class Scatter:
     coordinates = []
 
     def addCoordinate(self, altitude, longitude):
-        c = coordinate(altitude, longitude)
+        c = Coordinate(altitude, longitude)
         self.coordinates.append(c)
 
     def plotScatter(self):
@@ -38,7 +40,7 @@ class scatter:
 
 
 # Zet dit in main.py
-s = scatter()
+s = Scatter()
 s.addCoordinate(51.22378540, 4.40892172)  # Coordinates from wigle http-request with ssid=Uantwerpen (stadscampus)
 s.addCoordinate(51.22327042, 4.40893793)
 s.addCoordinate(51.22335815, 4.40887070)

@@ -1,5 +1,6 @@
 import requests
 
+
 class Localization:
     userID = ""
     password = ""
@@ -32,8 +33,8 @@ class Localization:
               % (ssid, resultsPerPage)
         return url
 
-    def getResponse(self, url):
-        response = requests.post(url, data=data)
+    # def getResponse(self, url):
+    #     response = requests.post(url, data=data)
 
     def request(self, url):
         r = requests.get(url, auth=('AID6e6e0f71da38f4b56d8c5990b0a540f1',  # Authentication:
@@ -43,14 +44,13 @@ class Localization:
 
     def decodeObject(self, r):  #@TODO: meerdere coordinaten opslaan in array of list
         data = r.json()
-        resultCount = data["resultCount"]
+        resultCount = data['resultCount']
+        results     = data['results']
+        trilat      = results[0]['trilat']
+        trilong     = results[0]['trilong']
+        position    = [trilat, trilong]
         print("ResultCount = " + str(resultCount))
-        results = data["results"]
-        trilat = results[0]["trilat"]
-        print("Latitude = " + str(trilat))
-        trilong = results[0]["trilong"]
-        print("Longitude = " + str(trilong))
-        position = [trilat, trilong]
+        print("Latitude = " + str(trilat) + ", Longitude = " + str(trilong))
 
         # param1 = data["success"]  # Use this in case daily limit of requests is reached
         # param2 = data["error"]
@@ -64,11 +64,12 @@ class Localization:
 
 l = Localization("user", "pw")
 
-input_resultsPerPage = input("Give amount of results per page: ")
-input_ssid = input("Give the SSID you are looking for: ")
+l.setResultsPerPage(input("Give amount of results per page: "))
 
-url = l.createURL(input_ssid, input_resultsPerPage)
-print(url)
+l.ssid = input("Give the SSID you are looking for: ")
+
+url = l.createURL(l.ssid, l.resultsPerPage)
+print("Created URL:   " + url)
 
 request = l.request(url)            # perform the request
 position = l.decodeObject(request)  # response unmarshalling (this function also prints the data to the output)
@@ -88,13 +89,14 @@ position = l.decodeObject(request)  # response unmarshalling (this function also
 
 
 # import scatter:
-# s = scatter()
+# s = Scatter()
 # s.addCoordinate(51.22378540, 4.40892172)  # Coordinates from wigle request with ssid=Uantwerpen (stadscampus)
 # s.addCoordinate(51.22327042, 4.40893793)
 # s.addCoordinate(51.22335815, 4.40887070)
 # s.addCoordinate(51.22303772, 4.40889168)
 # s.addCoordinate(51.17709351, 4.41607475)  # Campus Groenenborger
 # s.plotScatter()
+
 
 
 
