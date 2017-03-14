@@ -1,8 +1,9 @@
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
+import haversine
 
-# @TODO: Tel aantal request per 24 uur: 6
+# @TODO: Tel aantal request per 24 uur: 3
 
 
 class Localization:
@@ -57,21 +58,12 @@ class Localization:
         for result in range(0, len(results)):
             trilat = results[count]['trilat']
             trilong = results[count]['trilong']
-            print("Latitude = " + str(trilat) + ", Longitude = " + str(trilong))
+            print("N " + str(trilat) + ", E " + str(trilong))
             position = [trilat, trilong]
             positions.append(position)
             count += 1
 
         return positions
-
-    def plotCoordinates(self, scatter_coordinates):
-        for coordinate in scatter_coordinates:
-            scatter_latitude = coordinate[0]
-            scatter_longitude = coordinate[1]
-            print("Coordinate for scatter: N" + str(scatter_latitude) + " E" + str(scatter_longitude))
-            plt.scatter(scatter_latitude, scatter_longitude)
-        plt.suptitle('Scatter plot of ' + str(l.resultsPerPage) + ' coordinates with SSID = ' + str(l.ssid))
-        plt.show()
 
     def calcMean(self, mean_coordinates):
         sum_latitudes = 0
@@ -82,29 +74,41 @@ class Localization:
         mean_latitude = sum_latitudes / len(mean_coordinates)  # evt. afronden: round(floatgetal, 8)
         mean_longitude = sum_longitudes / len(mean_coordinates)
         print("Mean coordinate: N" + str(mean_latitude) + " E" + str(mean_longitude))
-        mean = [mean_latitude, mean_longitude]
-        return mean
+        calcedMean = [mean_latitude, mean_longitude]
+        return calcedMean
 
-    def calcError(self, coordinates, mean):
-        print("The error is ...")
+    def calcError(self, mean):
+        measuredLatitude = float(input("Give the latitude of the coordinate you measured: "))
+        measuredLongitude = float(input("Give the longitude of the coordinate you measured: "))
+        latitudeError = abs(measuredLatitude - mean[0])
+        longitudeError = abs(measuredLongitude - mean[1])
+        print("The coordinate error is " + str(latitudeError) + ", " + str(longitudeError))
+
+        measurementCoordinate = (measuredLatitude, measuredLongitude)
+        meanCoordinate = (mean[0], mean[1])
+        print(haversine.haversine(measurementCoordinate, meanCoordinate) + " km")  # print difference in kilometers
+
+    def plotCoordinates(self, scatter_coordinates):
+        for coordinate in scatter_coordinates:
+            scatter_latitude = coordinate[0]
+            scatter_longitude = coordinate[1]
+            plt.scatter(scatter_latitude, scatter_longitude)
+        plt.suptitle('Scatter plot of ' + str(l.resultsPerPage) + ' coordinates with SSID = ' + str(l.ssid))
+        plt.show()
 
 
 # Authenticate, perform HTTP-request to Wigle-server, find coordinates in JSON-string, plot them and calculate mean
 # -----------------------------------------------------------------------------------------------------------------
-l = Localization("user", "pw")
-
-l.resultsPerPage = input("Give amount of results per page: ")
+l = Localization("user", "pw")                                  # Create Localization object
+l.resultsPerPage = input("Give amount of results per page: ")   # with SSID and resultsPerPage
 l.ssid = input("Give the SSID you are looking for: ")
-url = l.createURL(l.ssid, l.resultsPerPage)
+url = l.createURL(l.ssid, l.resultsPerPage)                     # Create URL for the request
 print("Created URL:   " + url)
-
-request = l.request(url)                # perform the request
-coordinates = l.decodeObject(request)   # response unmarshalling (this function also prints the data to the output)
-
-mean = l.calcMean(coordinates)          # calculate the mean position of the coordinates
-l.calcError(coordinates, mean)          # calculate error between measured and real coordinate
-
-l.plotCoordinates(coordinates)          # plot coordinates in scatter plot
+request = l.request(url)                                        # perform the request
+coordinates = l.decodeObject(request)                           # response unmarshalling (this function also prints the data to the output)
+mean = l.calcMean(coordinates)                                  # calculate the mean position of the coordinates
+l.calcError(mean)                                               # calculate error between measured and real coordinate
+l.plotCoordinates(coordinates)                                  # plot coordinates in scatter plot
 
 
 
@@ -134,9 +138,6 @@ l.plotCoordinates(coordinates)          # plot coordinates in scatter plot
 # s.addCoordinate(51.17709351, 4.41607475)  # Campus Groenenborger
 # s.plotScatter()
 
-
-
-# HAVERSINE
 
 
 
