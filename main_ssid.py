@@ -8,8 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import haversine
 
-# @TODO: Tel aantal request per 24 uur: 4
-
 
 class Localization:
     userID = ""

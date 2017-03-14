@@ -1,21 +1,29 @@
+"""
+6-Bachelor thesis: Wi-Fi localization - Thomas Janssen
+Localization v2: Use BSSID of a network to find coordinates via www.wigle.net and calculate the error.
+"""
+
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
 import haversine
 
-# @TODO: Tel aantal request per 24 uur: 4
+# @TODO: Tel aantal request per 24 uur: 6
 
 
 class Localization:
     userID = ""
     password = ""
     url = ""
-    ssid = ""
-    resultsPerPage = 10  # default=10 (daily limited amount of requests!)
+    netid1 = ""
+    netid2 = ""
+    resultsPerPage = 1  # default=10 (daily limited amount of requests!)
 
-    def __init__(self, userID, password):
+    def __init__(self, userID, password, resultsPerPage):
         self.userID = userID
         self.password = password
+        self.resultsPerPage = resultsPerPage
+
 
     def setuserID(self, newUserID):
         userID = newUserID
@@ -25,17 +33,17 @@ class Localization:
         password = newPassword
         print("Password set to " + password)
 
-    def setSSID(self, newSSID):
-        ssid = newSSID
-        return ssid
+    def setNetID(self, newNetID):
+        netid = newNetID
+        return netid
 
     def setResultsPerPage(self, newResultsPerPage):
         self.resultsPerPage = newResultsPerPage
         return self.resultsPerPage
 
-    def createURL(self, ssid, resultsPerPage):
-        url = "https://api.wigle.net/api/v2/network/search?freenet=false&paynet=false&ssid=%s&resultsPerPage=%s" \
-              % (ssid, resultsPerPage)
+    def createURLwithNetID(self, netid, resultsPerPage):
+        url = "https://api.wigle.net/api/v2/network/search?freenet=false&paynet=false&netid=%s&resultsPerPage=%s" \
+              % (netid, resultsPerPage)
         return url
 
     def request(self, url):
@@ -44,35 +52,22 @@ class Localization:
         print(r.text)  # print string
         return r
 
-    def decodeObject(self, r):
-        data = r.json()
-
-        resultCount = data['resultCount']
-        print("ResultCount = " + str(resultCount))
+    def decodeObject(self, request):
+        data = request.json()
 
         results = data['results']
+        trilat = results[0]['trilat']
+        trilong = results[0]['trilong']
+        print("Coordinate : N" + str(trilat) + " E" + str(trilong))
+        coordinate = [trilat, trilong]
 
-        count = 0
-        positions = []
+        return coordinate
 
-        for result in range(0, len(results)):
-            trilat = results[count]['trilat']
-            trilong = results[count]['trilong']
-            print("N " + str(trilat) + ", E " + str(trilong))
-            position = [trilat, trilong]
-            positions.append(position)
-            count += 1
-
-        return positions
-
-    def calcMean(self, mean_coordinates):
-        sum_latitudes = 0
-        sum_longitudes = 0
-        for coordinate in mean_coordinates:
-            sum_latitudes += coordinate[0]
-            sum_longitudes += coordinate[1]
-        mean_latitude = sum_latitudes / len(mean_coordinates)  # evt. afronden: round(floatgetal, 8)
-        mean_longitude = sum_longitudes / len(mean_coordinates)
+    def calcMean(self, coord1, coord2):
+        sum_latitudes = coord1[0] + coord2[0]
+        sum_longitudes = coord1[1] + coord2[1]
+        mean_latitude = sum_latitudes / 2  # evt. afronden: round(floatgetal, 8)
+        mean_longitude = sum_longitudes / 2
         print("Mean coordinate: N" + str(mean_latitude) + " E" + str(mean_longitude))
         calcedMean = [mean_latitude, mean_longitude]
         return calcedMean
@@ -88,27 +83,41 @@ class Localization:
         distance = haversine.haversine(measurementCoordinate, meanCoordinate)
         print("The distance between the coordinates is " + str(distance) + " km")  # print difference in kilometers
 
-    def plotCoordinates(self, scatter_coordinates):
-        for coordinate in scatter_coordinates:
-            scatter_latitude = coordinate[0]
-            scatter_longitude = coordinate[1]
-            plt.scatter(scatter_latitude, scatter_longitude)
-        plt.suptitle('Scatter plot of ' + str(l.resultsPerPage) + ' coordinates with SSID = ' + str(l.ssid))
+    def plotCoordinates(self, coord1, coord2):
+        plt.scatter(coord1[0], coord1[1])
+        plt.scatter(coord2[0], coord2[1])
+        plt.suptitle('Mean coordinate vs. Measured coordinate')
         plt.show()
 
 
 # Authenticate, perform HTTP-request to Wigle-server, find coordinates in JSON-string, plot them and calculate mean
 # -----------------------------------------------------------------------------------------------------------------
-l = Localization("user", "pw")                                  # Create Localization object
-l.resultsPerPage = input("Give amount of results per page: ")   # with SSID and resultsPerPage
-l.ssid = input("Give the SSID you are looking for: ")
-url = l.createURL(l.ssid, l.resultsPerPage)                     # Create URL for the request
-print("Created URL:   " + url)
-request = l.request(url)                                        # perform the request
-coordinates = l.decodeObject(request)                           # response unmarshalling (this function also prints the data to the output)
-mean = l.calcMean(coordinates)                                  # calculate the mean position of the coordinates
+l = Localization("user", "pw", 1)                               # Create Localization object
+
+l.resultsPerPage = 2                                            # with 2 netID's and 2 resultsPerPage
+l.netid1 = input("Give the first netid (BSSID) you see: ")
+l.netid2 = input("Give the second netid (BSSID) you see: ")
+
+url1 = l.createURLwithNetID(l.netid1, l.resultsPerPage)         # Create URL  with given BSSID (netid) 1
+url2 = l.createURLwithNetID(l.netid2, l.resultsPerPage)         # Create URL  with given BSSID (netid) 2
+# url = l.createURLwithSSID(l.ssid, l.resultsPerPage)           # Create URL  with given SSID (v1)
+print("Created URL 1:   " + url1)
+print("Created URL 2:   " + url2)
+
+request1 = l.request(url1)                                      # Perform 2 requests
+request2 = l.request(url2)
+
+coordinate1 = l.decodeObject(request1)                          # response unmarshalling (+ print data to console)
+coordinate2 = l.decodeObject(request2)
+mean = l.calcMean(coordinate1, coordinate2)                     # calculate the mean position of the coordinates
 l.calcError(mean)                                               # calculate error between measured and real coordinate
-l.plotCoordinates(coordinates)                                  # plot coordinates in scatter plot
+l.plotCoordinates(coordinate1, coordinate2)                     # plot coordinates in scatter plot
+
+
+
+
+
+
 
 
 # Use this in case daily limit of requests is reached:

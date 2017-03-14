@@ -1,3 +1,6 @@
+# OPEN STREET MAPS IN PYTHON:
+# http://michal.rawlik.pl/2013/03/19/openstreetmap-maps-in-python/
+
 # from urllib import urlopen
 # from pylab import imshow, imread, show
 #
@@ -21,18 +24,4 @@
 #
 # show()
 
-
-import haversine
-mean = [51.123456, 4.58541]
-
-measuredLatitude = float(input("Give the latitude of the coordinate you measured: "))
-measuredLongitude = float(input("Give the longitude of the coordinate you measured: "))
-latitudeError = abs(measuredLatitude - mean[0])
-longitudeError = abs(measuredLongitude - mean[1])
-print("The coordinate error is " + str(latitudeError) + ", " + str(longitudeError))
-
-measurementCoordinate = (measuredLatitude, measuredLongitude)
-meanCoordinate = (mean[0], mean[1])
-distance = haversine.haversine(measurementCoordinate, meanCoordinate)
-print("The distance between the coordinates is " + str(distance) + " km")  # print difference in kilometers
-
+print(k2)
