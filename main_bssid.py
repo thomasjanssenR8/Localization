@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import haversine
 
-# @TODO: Tel aantal request per 24 uur: 3
+# @TODO: Tel aantal request per 24 uur: 4
 
 
 class Localization:
@@ -80,13 +80,13 @@ class Localization:
     def calcError(self, mean):
         measuredLatitude = float(input("Give the latitude of the coordinate you measured: "))
         measuredLongitude = float(input("Give the longitude of the coordinate you measured: "))
-        latitudeError = abs(measuredLatitude - mean[0])
-        longitudeError = abs(measuredLongitude - mean[1])
-        print("The coordinate error is " + str(latitudeError) + ", " + str(longitudeError))
-
+        # latitudeError = abs(measuredLatitude - mean[0])
+        # longitudeError = abs(measuredLongitude - mean[1])
+        # print("The coordinate error is " + str(latitudeError) + ", " + str(longitudeError))
         measurementCoordinate = (measuredLatitude, measuredLongitude)
         meanCoordinate = (mean[0], mean[1])
-        print(haversine.haversine(measurementCoordinate, meanCoordinate) + " km")  # print difference in kilometers
+        distance = haversine.haversine(measurementCoordinate, meanCoordinate)
+        print("The distance between the coordinates is " + str(distance) + " km")  # print difference in kilometers
 
     def plotCoordinates(self, scatter_coordinates):
         for coordinate in scatter_coordinates:
@@ -109,8 +109,6 @@ coordinates = l.decodeObject(request)                           # response unmar
 mean = l.calcMean(coordinates)                                  # calculate the mean position of the coordinates
 l.calcError(mean)                                               # calculate error between measured and real coordinate
 l.plotCoordinates(coordinates)                                  # plot coordinates in scatter plot
-
-
 
 
 # Use this in case daily limit of requests is reached:
@@ -138,7 +136,7 @@ l.plotCoordinates(coordinates)                                  # plot coordinat
 # s.addCoordinate(51.17709351, 4.41607475)  # Campus Groenenborger
 # s.plotScatter()
 
-
+# Show BSSID's in Windows cmd: netsh wlan show networks mode=bssid
 
 
 
