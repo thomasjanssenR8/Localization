@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import haversine
 import subprocess
 
-# @TODO: Tel aantal request per 24 uur: 1
+# @TODO: Tel aantal request per 24 uur: 2
 
 
 class Localization:
@@ -41,6 +41,19 @@ class Localization:
         self.resultsPerPage = newResultsPerPage
         return self.resultsPerPage
 
+    def getBSSIDs(self):
+        cmd_output = subprocess.check_output('netsh wlan show networks mode=bssid')
+        print(cmd_output)
+        cmd = cmd_output.decode('UTF-8')
+        index1 = cmd.find("BSSID")  # index of first letter that matches the string
+        index2 = cmd.find("BSSID", index1 + 1)
+        bssid1 = cmd[(index1 + 26):index1 + 43]  # 26-43 = BSSID (network MAC-adres)
+        bssid2 = cmd[(index2 + 26):index2 + 43]
+        print(bssid1)
+        print(bssid2)
+        bssids = [bssid1, bssid2]
+        return bssids
+
     def createURLwithNetID(self, netid, resultsPerPage):
         url = "https://api.wigle.net/api/v2/network/search?freenet=false&paynet=false&netid=%s&resultsPerPage=%s" \
               % (netid, resultsPerPage)
@@ -56,11 +69,13 @@ class Localization:
         data = request.json()
 
         results = data['results']
-
-        trilat = results[0]['trilat']
-        trilong = results[0]['trilong']
-        print("Coordinate : N" + str(trilat) + " E" + str(trilong))
-        coordinate = [trilat, trilong]
+        if not results:  # if list is empty
+            coordinate = []
+        else:
+            trilat = results[0]['trilat']
+            trilong = results[0]['trilong']
+            print("Coordinate : N" + str(trilat) + " E" + str(trilong))
+            coordinate = [trilat, trilong]
 
         return coordinate
 
@@ -90,18 +105,7 @@ class Localization:
         plt.suptitle('Mean coordinate vs. Measured coordinate')
         plt.show()
 
-    def getBSSIDs(self):
-        cmd_output = subprocess.check_output('netsh wlan show networks mode=bssid')
-        print(cmd_output)
-        cmd = cmd_output.decode('UTF-8')
-        index1 = cmd.find("BSSID")  # index of first letter that matches the string
-        index2 = cmd.find("BSSID", index1 + 1)
-        bssid1 = cmd[(index1 + 26):index1 + 43]  # 26-43 = BSSID (network MAC-adres)
-        bssid2 = cmd[(index2 + 26):index2 + 43]
-        print(bssid1)
-        print(bssid2)
-        bssids = [bssid1, bssid2]
-        return bssids
+
 
 
 # Authenticate, perform HTTP-request to Wigle-server, find coordinates in JSON-string, plot them and calculate mean
@@ -121,10 +125,12 @@ request2 = l.request(url2)
 coordinate1 = l.decodeObject(request1)                          # response unmarshalling (+ print data to console)
 coordinate2 = l.decodeObject(request2)
 
-mean = l.calcMean(coordinate1, coordinate2)                     # calculate the mean position of the coordinates
-l.calcError(mean)                                               # calculate error between measured and real coordinate
-
-l.plotCoordinates(coordinate1, coordinate2)                     # plot coordinates in scatter plot
+if len(coordinate1) == 0 or len(coordinate2) == 0:
+    print("One or two of the BSSID's were not found in the Wigle database.")
+else:
+    mean = l.calcMean(coordinate1, coordinate2)                 # calculate the mean position of the coordinates
+    l.calcError(mean)                                           # calculate error between measured and real coordinate
+    l.plotCoordinates(coordinate1, coordinate2)                 # plot coordinates in scatter plot
 
 
 
