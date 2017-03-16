@@ -7,8 +7,9 @@ import requests
 import numpy as np
 import matplotlib.pyplot as plt
 import haversine
+import subprocess
 
-# @TODO: Tel aantal request per 24 uur: 6
+# @TODO: Tel aantal request per 24 uur: 1
 
 
 class Localization:
@@ -23,7 +24,6 @@ class Localization:
         self.userID = userID
         self.password = password
         self.resultsPerPage = resultsPerPage
-
 
     def setuserID(self, newUserID):
         userID = newUserID
@@ -56,6 +56,7 @@ class Localization:
         data = request.json()
 
         results = data['results']
+
         trilat = results[0]['trilat']
         trilong = results[0]['trilong']
         print("Coordinate : N" + str(trilat) + " E" + str(trilong))
@@ -89,18 +90,28 @@ class Localization:
         plt.suptitle('Mean coordinate vs. Measured coordinate')
         plt.show()
 
+    def getBSSIDs(self):
+        cmd_output = subprocess.check_output('netsh wlan show networks mode=bssid')
+        print(cmd_output)
+        cmd = cmd_output.decode('UTF-8')
+        index1 = cmd.find("BSSID")  # index of first letter that matches the string
+        index2 = cmd.find("BSSID", index1 + 1)
+        bssid1 = cmd[(index1 + 26):index1 + 43]  # 26-43 = BSSID (network MAC-adres)
+        bssid2 = cmd[(index2 + 26):index2 + 43]
+        print(bssid1)
+        print(bssid2)
+        bssids = [bssid1, bssid2]
+        return bssids
+
 
 # Authenticate, perform HTTP-request to Wigle-server, find coordinates in JSON-string, plot them and calculate mean
 # -----------------------------------------------------------------------------------------------------------------
 l = Localization("user", "pw", 1)                               # Create Localization object
-
 l.resultsPerPage = 2                                            # with 2 netID's and 2 resultsPerPage
-l.netid1 = input("Give the first netid (BSSID) you see: ")
-l.netid2 = input("Give the second netid (BSSID) you see: ")
+[l.netid1, l.netid2] = l.getBSSIDs()
 
 url1 = l.createURLwithNetID(l.netid1, l.resultsPerPage)         # Create URL  with given BSSID (netid) 1
 url2 = l.createURLwithNetID(l.netid2, l.resultsPerPage)         # Create URL  with given BSSID (netid) 2
-# url = l.createURLwithSSID(l.ssid, l.resultsPerPage)           # Create URL  with given SSID (v1)
 print("Created URL 1:   " + url1)
 print("Created URL 2:   " + url2)
 
@@ -109,8 +120,10 @@ request2 = l.request(url2)
 
 coordinate1 = l.decodeObject(request1)                          # response unmarshalling (+ print data to console)
 coordinate2 = l.decodeObject(request2)
+
 mean = l.calcMean(coordinate1, coordinate2)                     # calculate the mean position of the coordinates
 l.calcError(mean)                                               # calculate error between measured and real coordinate
+
 l.plotCoordinates(coordinate1, coordinate2)                     # plot coordinates in scatter plot
 
 

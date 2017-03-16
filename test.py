@@ -24,4 +24,6 @@
 #
 # show()
 
-print(k2)
+personen = ['thomas', 'peter']
+[naam1, naam2] = personen
+print(naam1)
