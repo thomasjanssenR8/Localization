@@ -8,9 +8,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import haversine
 import subprocess
+import csv
 
-# @TODO: Tel aantal request per 24 uur: 2
 
+# @TODO: Aantal request per 24 uur: 3
+# @TODO: Vergelijk met locationAPI.org
+# STAPPENPLAN:
+#   - Locatie bepalen + BSSID (en RSS signaal) schrijven naar csv (30 locaties)
+#   - Locaties opvragen van BSSIDS op Wigle en locationAPI.org
+#   - Accuracy bepalen en vergelijken
+
+# slechts 1 BSSID per request sturen
+# wat als 1 van de BSSIDs niet gekend is door Wigle? vergelijk met api!
+# document in het Engels?
 
 class Localization:
     userID = ""
@@ -52,11 +62,13 @@ class Localization:
         print(bssid1)
         print(bssid2)
         bssids = [bssid1, bssid2]
+        # bssids = ['00:0B:86:26:86:16', 'D8:C7:C8:CE:31:50']
         return bssids
 
     def createURLwithNetID(self, netid, resultsPerPage):
         url = "https://api.wigle.net/api/v2/network/search?freenet=false&paynet=false&netid=%s&resultsPerPage=%s" \
               % (netid, resultsPerPage)
+        #url = "https://api.wigle.net/api/v2/network/search?freenet=false&paynet=false&netid=00:0B:86:26:86:16&netid=D8:C7:C8:CE:31:50&resultsPerPage=3"
         return url
 
     def request(self, url):
@@ -67,7 +79,6 @@ class Localization:
 
     def decodeObject(self, request):
         data = request.json()
-
         results = data['results']
         if not results:  # if list is empty
             coordinate = []
@@ -76,7 +87,6 @@ class Localization:
             trilong = results[0]['trilong']
             print("Coordinate : N" + str(trilat) + " E" + str(trilong))
             coordinate = [trilat, trilong]
-
         return coordinate
 
     def calcMean(self, coord1, coord2):
@@ -98,6 +108,8 @@ class Localization:
         meanCoordinate = (mean[0], mean[1])
         distance = haversine.haversine(measurementCoordinate, meanCoordinate)
         print("The distance between the coordinates is " + str(distance) + " km")  # print difference in kilometers
+        measurement = [measuredLatitude, measuredLongitude, distance]
+        return measurement
 
     def plotCoordinates(self, coord1, coord2):
         plt.scatter(coord1[0], coord1[1])
@@ -105,10 +117,20 @@ class Localization:
         plt.suptitle('Mean coordinate vs. Measured coordinate')
         plt.show()
 
+    def writeToFile(self, mean_output, gps_output):
+        file = open("results.csv", "a")  # append to CSV file
+        try:
+            writer = csv.writer(file)
+            # Write: Actual coordinate, measured coordinate and distance betweem them
+            writer.writerow([gps_output[0], gps_output[1], mean_output[0], mean_output[1], gps_output[2]])
+        finally:
+            file.close()
 
 
 
-# Authenticate, perform HTTP-request to Wigle-server, find coordinates in JSON-string, plot them and calculate mean
+
+
+#  Main program
 # -----------------------------------------------------------------------------------------------------------------
 l = Localization("user", "pw", 1)                               # Create Localization object
 l.resultsPerPage = 2                                            # with 2 netID's and 2 resultsPerPage
@@ -122,15 +144,16 @@ print("Created URL 2:   " + url2)
 request1 = l.request(url1)                                      # Perform 2 requests
 request2 = l.request(url2)
 
-coordinate1 = l.decodeObject(request1)                          # response unmarshalling (+ print data to console)
-coordinate2 = l.decodeObject(request2)
+coordinate1 = l.decodeObject(request1)                          # Unmarshalling: find coordinates in json string
+coordinate2 = l.decodeObject(request2)                          # and print data to console
 
 if len(coordinate1) == 0 or len(coordinate2) == 0:
     print("One or two of the BSSID's were not found in the Wigle database.")
 else:
-    mean = l.calcMean(coordinate1, coordinate2)                 # calculate the mean position of the coordinates
-    l.calcError(mean)                                           # calculate error between measured and real coordinate
-    l.plotCoordinates(coordinate1, coordinate2)                 # plot coordinates in scatter plot
+    mean = l.calcMean(coordinate1, coordinate2)                 # Calculate the mean position of the coordinates
+    measure = l.calcError(mean)                                 # Calculate error between measured and real coordinate
+    l.plotCoordinates(coordinate1, coordinate2)                 # Plot coordinates in scatter plot
+    l.writeToFile(mean, measure)                                # Write results to CSV file
 
 
 
@@ -156,7 +179,6 @@ else:
 # longitude = data[longitude_index: (longitude_index+10)]
 # print("E"+longitude)
 
-
 # s.addCoordinate(51.22378540, 4.40892172)  # Coordinates from wigle request with ssid=Uantwerpen (stadscampus)
 # s.addCoordinate(51.22327042, 4.40893793)
 # s.addCoordinate(51.22335815, 4.40887070)
@@ -164,7 +186,6 @@ else:
 # s.addCoordinate(51.17709351, 4.41607475)  # Campus Groenenborger
 # s.plotScatter()
 
-# Show BSSID's in Windows cmd: netsh wlan show networks mode=bssid
 
 
 

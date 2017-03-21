@@ -1,29 +1,58 @@
-# OPEN STREET MAPS IN PYTHON:
-# http://michal.rawlik.pl/2013/03/19/openstreetmap-maps-in-python/
+"""
+6-Bachelor thesis: Wi-Fi localization - Thomas Janssen
+Localization v3: Collect BSSIDs in your vicinity
+"""
 
-# from urllib import urlopen
-# from pylab import imshow, imread, show
+# import subprocess
+# import csv
+# bssids = ['do', 're', 'mi']
+# strengths = [50, 48, 99]
+# data = [bssids, strengths]
 #
-# lon = [49.5, 50.35]
-# lat = [18.6, 20.2]
-# scale = 700000
-#
-# # open an openstreetmap export png file via http
-# url = urlopen('http://parent.tile.openstreetmap.org/cgi-bin/export?'
-#               'bbox={lat1:.2f},{lon1:.2f},{lat2:.2f},{lon2:.2f}&'
-#               'scale={scale:d}&format=png'.format(lat1=lat[0],
-#               lat2=lat[1],
-#               lon1=lon[0],
-#               lon2=lon[1],
-#               scale=scale))
-#
-# # plot the map
-# imshow(imread(url), extent=lat+lon, aspect='equal')
-#
-# # plot other data here
-#
-# show()
+# file = open('bssids.csv', 'a', newline='')
+# writer = csv.writer(file, delimiter=',')
 
-personen = ['thomas', 'peter']
-[naam1, naam2] = personen
-print(naam1)
+# for element in data:
+#     writer.writerow([data[0], data[1]])
+
+# file = open("results.csv", "a", newline="")                     # Append data to CSV file
+# fields = ['BSSID', 'Signal strength']
+# writer = csv.DictWriter(file, delimiter=',', fieldnames=fields)
+# writer.writerow(" ")                                            # Blank line between 2 measurements
+# writer.writerow({})
+#
+# file.close()
+
+# with open('bssids.csv', 'a', newline='') as output:
+#     writer = csv.writer(output, delimiter=',')
+#     writer.writerow([data[0], data[1]])
+
+
+# Omgekeerde volgorde:
+# file = 'bssids.xlsx'
+# book = openpyxl.load_workbook(filename=file)
+# sheet = book.active
+#
+# for row in data:
+#     sheet.append(row)
+
+# sheet.save(file)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
