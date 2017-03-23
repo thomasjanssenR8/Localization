@@ -11,10 +11,9 @@ import subprocess
 import csv
 
 
-# @TODO: Aantal request per 24 uur: 3
-# @TODO: Vergelijk met locationAPI.org
+# @TODO: Aantal request per 24 uur: 1
 # STAPPENPLAN:
-#   - Locatie bepalen + BSSID (en RSS signaal) schrijven naar csv (30 locaties)
+#   - Locatie bepalen + BSSID (en RSS signaal) schrijven naar xlsx (30 locaties)
 #   - Locaties opvragen van BSSIDS op Wigle en locationAPI.org
 #   - Accuracy bepalen en vergelijken
 
