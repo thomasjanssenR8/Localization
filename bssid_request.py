@@ -31,7 +31,6 @@ def decodeObject(request):
     data = request.json()
     if not data['success'] or not data['results']:                                      # If daily limit reached or empty list
         coordinate = []
-        print('Succes = false')
     else:
         results = data['results']
         trilat = results[0]['trilat']
