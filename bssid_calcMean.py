@@ -107,8 +107,8 @@ def calc_mean():
 
 
 def calc_error():
-    gps_latitude = sheet['J1'].value
-    gps_longitude = sheet['K1'].value
+    gps_latitude = sheet['J2'].value
+    gps_longitude = sheet['K2'].value
     gps_coordinate = (gps_latitude, gps_longitude)
 
     # Write error in column J, using the haversine function
@@ -139,7 +139,7 @@ def calc_chances():
     sheet.cell(row=end_row+3, column=8).value = chance_both_not_found
 
 
-file = 'bssids.xlsx'                                            # Load Excel sheet of a location (e.g. BAP1)
+file = 'data.xlsx'                                            # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 sheet = book.get_sheet_by_name('BAP' + input('Give the sheet number: BAP'))
 
