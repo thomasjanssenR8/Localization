@@ -45,83 +45,65 @@ def write_combinations_to_file():
 
     row_index = end_row + 6
 
-    i = 0  # Write combination number in column A
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index+len(bssid_combs)-1, min_col=1, max_col=1):
-        for cell in row:
-            i += 1
-            cell.value = i
+    # Write combination number in column A
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index+i, column=1).value = i
 
-    i = 0  # Write BSSID 1 in column B
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index+len(bssid_combs)-1, min_col=2, max_col=2):
-        for cell in row:
-            cell.value = bssid_combs[i][0]
-            i += 1
+    # Write BSSID 1 in column B
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index+i, column=2).value = bssid_combs[i][0]
 
-    i = 0  # Write BSSID 2 in column C
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index+len(bssid_combs)-1, min_col=3, max_col=3):
-        for cell in row:
-            cell.value = bssid_combs[i][1]
-            i += 1
+    # Write BSSID 2 in column C
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index+i, column=3).value = bssid_combs[i][1]
 
-    i = 0  # Write latitude of BSSID 1 in column D
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index+len(bssid_combs)-1, min_col=4, max_col=4):
-        for cell in row:
-            cell.value = lat_combs[i][0]
-            i += 1
+    # Write latitude of BSSID 1 in column D
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index+i, column=4).value = lat_combs[i][0]
 
-    i = 0  # Write longitude of BSSID 1 in column E
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=5, max_col=5):
-        for cell in row:
-            cell.value = long_combs[i][0]
-            i += 1
+    # Write longitude of BSSID 1 in column E
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index+i, column=5).value = long_combs[i][0]
 
-    i = 0  # Write latitude of BSSID 2 in column F
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=6, max_col=6):
-        for cell in row:
-            cell.value = lat_combs[i][1]
-            i += 1
+    # Write latitude of BSSID 2 in column F
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index+i, column=6).value = lat_combs[i][1]
 
-    i = 0  # Write longitude of BSSID 2 in column G
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=7, max_col=7):
-        for cell in row:
-            cell.value = long_combs[i][1]
-            i += 1
+    # Write longitude of BSSID 2 in column G
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index+i, column=7).value = long_combs[i][1]
 
 
 def calc_mean():
-    i = 0  # Write mean latitude of the 2 BSSIDs in column H
+    # Write mean latitude of the 2 BSSIDs in column H
     row_index = end_row + 6
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=8, max_col=8):
-        for cell in row:
-            if not lat_combs[i][0] and not lat_combs[i][1]:     # both BSSIDs were not found in database
-                mean_latitude = None
-            elif not lat_combs[i][0]:                           # one of two BSSIDs was not found in database
-                mean_latitude = lat_combs[i][1]
-            elif not lat_combs[i][1]:
-                mean_latitude = lat_combs[i][0]
-            else:
-                mean_latitude = (lat_combs[i][0] + lat_combs[i][1]) / 2
+    for i in range(0, len(bssid_combs)):
+        if not lat_combs[i][0] and not lat_combs[i][1]:  # both BSSIDs were not found in database
+            mean_latitude = None
+        elif not lat_combs[i][0]:  # one of two BSSIDs was not found in database
+            mean_latitude = lat_combs[i][1]
+        elif not lat_combs[i][1]:
+            mean_latitude = lat_combs[i][0]
+        else:
+            mean_latitude = (lat_combs[i][0] + lat_combs[i][1]) / 2
 
-            cell.value = mean_latitude
-            mean_latitudes.append(mean_latitude)
-            i += 1
+        sheet.cell(row=row_index+i, column=8).value = mean_latitude
+        mean_latitudes.append(mean_latitude)
 
-    i = 0  # Write mean longitude of the 2 BSSIDs in column I
+    # Write mean longitude of the 2 BSSIDs in column I
     row_index = end_row + 6
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=9, max_col=9):
-        for cell in row:
-            if not long_combs[i][0] and not long_combs[i][1]:   # both BSSIDs were not found in database
-                mean_longitude = None
-            elif not long_combs[i][0]:                          # one of two BSSIDs was not found in database
-                mean_longitude = long_combs[i][1]
-            elif not long_combs[i][1]:
-                mean_longitude = long_combs[i][0]
-            else:
-                mean_longitude = (long_combs[i][0] + long_combs[i][1]) / 2
+    for i in range(0, len(bssid_combs)):
+        if not long_combs[i][0] and not long_combs[i][1]:   # both BSSIDs were not found in database
+            mean_longitude = None
+        elif not long_combs[i][0]:                          # one of two BSSIDs was not found in database
+            mean_longitude = long_combs[i][1]
+        elif not long_combs[i][1]:
+            mean_longitude = long_combs[i][0]
+        else:
+            mean_longitude = (long_combs[i][0] + long_combs[i][1]) / 2
 
-            cell.value = mean_longitude
-            mean_longitudes.append(mean_longitude)
-            i += 1
+        sheet.cell(row=row_index + i, column=9).value = mean_longitude
+        mean_longitudes.append(mean_longitude)
 
 
 def calc_error():
@@ -129,15 +111,13 @@ def calc_error():
     gps_longitude = sheet['K1'].value
     gps_coordinate = (gps_latitude, gps_longitude)
 
-    i = 0  # Write error in column J, using the haversine function
+    # Write error in column J, using the haversine function
     row_index = end_row + 6
-    for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=10, max_col=10):
-        for cell in row:
-            if mean_latitudes[i] and mean_longitudes[i]:                    # if there is a mean, calculate the error
-                mean_coordinate = (mean_latitudes[i], mean_longitudes[i])
-                distance = haversine(gps_coordinate, mean_coordinate)
-                cell.value = distance
-            i += 1
+    for i in range(0, len(bssid_combs)):
+        if mean_latitudes[i] and mean_longitudes[i]:                    # if there is a mean, calculate the error
+            mean_coordinate = (mean_latitudes[i], mean_longitudes[i])
+            distance = haversine(gps_coordinate, mean_coordinate)
+            sheet.cell(row=row_index+i, column=10).value = distance
 
 
 file = 'bssids.xlsx'                                            # Load Excel sheet of a location (e.g. BAP1)
