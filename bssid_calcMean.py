@@ -47,7 +47,7 @@ def write_combinations_to_file():
 
     # Write combination number in column A
     for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=1).value = i
+        sheet.cell(row=row_index+i, column=1).value = i+1
 
     # Write BSSID 1 in column B
     for i in range(0, len(bssid_combs)):
@@ -120,6 +120,22 @@ def calc_error():
             sheet.cell(row=row_index+i, column=10).value = distance
 
 
+def calc_chances():
+    bssids_not_found = 0
+    for i in range(0, len(bssids)):
+        if not latitudes[i] and not longitudes[i]:                      # if no match in database
+            bssids_not_found += 1
+    chance_not_found = float(bssids_not_found / amount_of_bssids * 100)     # percentage of total BSSIDs not found
+    print('%.2f %% of BSSIDs was not found in the Wigle database.' % chance_not_found)
+
+    both_not_found = 0
+    for i in range(0, len(bssid_combs)):
+        if not lat_combs[i][0] and not lat_combs[i][1]:
+            both_not_found += 1
+    chance_both_not_found = float(both_not_found / len(bssid_combs) * 100)  # percentage both BSSIDs in a pair not found
+    print('The chance of having of pair of BSSIDs both not found in the database is %.2f %%' % chance_both_not_found)
+
+
 file = 'bssids.xlsx'                                            # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 sheet = book.get_sheet_by_name('BAP' + input('Give the sheet number: BAP'))
@@ -134,8 +150,9 @@ write_combinations_to_file()                                    # Write all poss
 
 mean_latitudes = []
 mean_longitudes = []
-calc_mean()                                                      # Calculate the mean coordinate of each pair of BSSIDs
-calc_error()                                                     # Calculate distance between GPS and mean coordinate
+calc_mean()                                                     # Calculate the mean coordinate of each pair of BSSIDs
+calc_error()                                                    # Calculate distance between GPS and mean coordinate
+calc_chances()                                                  # Calculate the chance a BSSID is not found in database
 
 book.save(file)                                                 # Save the data
 
