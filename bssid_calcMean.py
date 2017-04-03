@@ -123,7 +123,7 @@ def calc_error():
 def calc_chances():
     bssids_not_found = 0
     for i in range(0, len(bssids)):
-        if not latitudes[i] and not longitudes[i]:                      # if no match in database
+        if not latitudes[i] and not longitudes[i]:                          # if no match in database
             bssids_not_found += 1
     chance_not_found = float(bssids_not_found / amount_of_bssids * 100)     # percentage of total BSSIDs not found
     print('%.2f %% of BSSIDs was not found in the Wigle database.' % chance_not_found)
@@ -134,6 +134,9 @@ def calc_chances():
             both_not_found += 1
     chance_both_not_found = float(both_not_found / len(bssid_combs) * 100)  # percentage both BSSIDs in a pair not found
     print('The chance of having of pair of BSSIDs both not found in the database is %.2f %%' % chance_both_not_found)
+
+    sheet.cell(row=end_row+2, column=8).value = chance_not_found            # write chances to Excel
+    sheet.cell(row=end_row+3, column=8).value = chance_both_not_found
 
 
 file = 'bssids.xlsx'                                            # Load Excel sheet of a location (e.g. BAP1)
