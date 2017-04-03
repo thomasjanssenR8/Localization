@@ -25,16 +25,13 @@ def get_data():
 
     for row in sheet.iter_rows(min_row=start_row, max_row=end_row, min_col=1, max_col=1):   # put BSSIDs in list
         for cell in row:
-            if cell.value:
-                bssids.append(cell.value)
+            bssids.append(cell.value)
     for row in sheet.iter_rows(min_row=start_row, max_row=end_row, min_col=3, max_col=3):   # put latitudes in list
         for cell in row:
-            if cell.value:
-                latitudes.append(cell.value)
+            latitudes.append(cell.value)
     for row in sheet.iter_rows(min_row=start_row, max_row=end_row, min_col=4, max_col=4):   # put longitudes in list
         for cell in row:
-            if cell.value:
-                longitudes.append(cell.value)
+            longitudes.append(cell.value)
 
     read_data = [start_row, end_row, amount_of_bssids, bssids, latitudes, longitudes]
     return read_data
@@ -86,21 +83,39 @@ def write_combinations_to_file():
             i += 1
 
 
-def calcMean():
+def calc_mean():
     i = 0  # Write mean latitude of the 2 BSSIDs in column H
     row_index = end_row + 6
     for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=8, max_col=8):
         for cell in row:
-            mean_latitude = (lat_combs[i][0] + lat_combs[i][1]) / 2
+            if not lat_combs[i][0] and not lat_combs[i][1]:     # both BSSIDs were not found in database
+                print("Both BSSIDs were not found in the database.")
+                mean_latitude = None
+            elif not lat_combs[i][0]:                           # one of two BSSIDs was not found in database
+                mean_latitude = lat_combs[i][1]
+            elif not lat_combs[i][1]:
+                mean_latitude = lat_combs[i][0]
+            else:
+                mean_latitude = (lat_combs[i][0] + lat_combs[i][1]) / 2
+
             cell.value = mean_latitude
             mean_latitudes.append(mean_latitude)
             i += 1
 
-    i = 0  # Write mean latitude of the 2 BSSIDs in column I
+    i = 0  # Write mean longitude of the 2 BSSIDs in column I
     row_index = end_row + 6
     for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=9, max_col=9):
         for cell in row:
-            mean_longitude = (long_combs[i][0] + long_combs[i][1]) / 2
+            if not long_combs[i][0] and not long_combs[i][1]:   # both BSSIDs were not found in database
+                print("Both BSSIDs were not found in the database.")
+                mean_longitude = None
+            elif not long_combs[i][0]:                          # one of two BSSIDs was not found in database
+                mean_longitude = long_combs[i][1]
+            elif not long_combs[i][1]:
+                mean_longitude = long_combs[i][0]
+            else:
+                mean_longitude = (long_combs[i][0] + long_combs[i][1]) / 2
+
             cell.value = mean_longitude
             mean_longitudes.append(mean_longitude)
             i += 1
@@ -115,9 +130,10 @@ def calc_error():
     row_index = end_row + 6
     for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=10, max_col=10):
         for cell in row:
-            mean_coordinate = (mean_latitudes[i], mean_longitudes[i])
-            distance = haversine(gps_coordinate, mean_coordinate)
-            cell.value = distance
+            if mean_latitudes[i] and mean_longitudes[i]:                    # if there is a mean, calculate the error
+                mean_coordinate = (mean_latitudes[i], mean_longitudes[i])
+                distance = haversine(gps_coordinate, mean_coordinate)
+                cell.value = distance
             i += 1
 
 
@@ -135,7 +151,7 @@ write_combinations_to_file()                                    # Write all poss
 
 mean_latitudes = []
 mean_longitudes = []
-calcMean()                                                      # Calculate the mean coordinate of each pair of BSSIDs
+calc_mean()                                                      # Calculate the mean coordinate of each pair of BSSIDs
 calc_error()                                                     # Calculate distance between GPS and mean coordinate
 
 book.save(file)                                                 # Save the data
