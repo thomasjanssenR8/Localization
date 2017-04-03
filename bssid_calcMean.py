@@ -38,6 +38,11 @@ def get_data():
 
 
 def write_combinations_to_file():
+
+    # Write amount of BSSIDS and combinations under the first table
+    sheet.cell(row=end_row + 2, column=3).value = amount_of_bssids
+    sheet.cell(row=end_row + 3, column=3).value = len(bssid_combs)
+
     row_index = end_row + 6
 
     i = 0  # Write combination number in column A
@@ -89,7 +94,6 @@ def calc_mean():
     for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=8, max_col=8):
         for cell in row:
             if not lat_combs[i][0] and not lat_combs[i][1]:     # both BSSIDs were not found in database
-                print("Both BSSIDs were not found in the database.")
                 mean_latitude = None
             elif not lat_combs[i][0]:                           # one of two BSSIDs was not found in database
                 mean_latitude = lat_combs[i][1]
@@ -107,7 +111,6 @@ def calc_mean():
     for row in sheet.iter_rows(min_row=row_index, max_row=row_index + len(bssid_combs) - 1, min_col=9, max_col=9):
         for cell in row:
             if not long_combs[i][0] and not long_combs[i][1]:   # both BSSIDs were not found in database
-                print("Both BSSIDs were not found in the database.")
                 mean_longitude = None
             elif not long_combs[i][0]:                          # one of two BSSIDs was not found in database
                 mean_longitude = long_combs[i][1]
