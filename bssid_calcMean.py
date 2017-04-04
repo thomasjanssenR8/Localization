@@ -139,25 +139,29 @@ def calc_chances():
     sheet.cell(row=end_row+3, column=8).value = chance_both_not_found
 
 
-file = 'data.xlsx'                                            # Load Excel sheet of a location (e.g. BAP1)
+file = 'data.xlsx'                                              # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
-sheet = book.get_sheet_by_name('BAP' + input('Give the sheet number: BAP'))
 
-[start_row, end_row, amount_of_bssids, bssids, latitudes, longitudes] = get_data()   # Load data from Excel sheet
+for i in range(1, 37):                                          # Load a template sheet for all 36 locations
+    sheet = book.get_sheet_by_name('BAP' + str(i))
 
-bssid_combs = list(combinations(bssids, 2))                     # Get all possible combinations of 2 BSSIDs
-lat_combs = list(combinations(latitudes, 2))                    # Get all the combinations of the measured latitudes
-long_combs = list(combinations(longitudes, 2))                  # Get all the combinations of the measured longitudes
+    [start_row, end_row, amount_of_bssids, bssids, latitudes, longitudes] = get_data()  # retrieve requested data
 
-write_combinations_to_file()                                    # Write all possible combinations to Excel file
+    bssid_combs = list(combinations(bssids, 2))                 # Get all possible combinations of 2 BSSIDs
+    lat_combs = list(combinations(latitudes, 2))                # Get all the combinations of the measured latitudes
+    long_combs = list(combinations(longitudes, 2))              # Get all the combinations of the measured longitudes
 
-mean_latitudes = []
-mean_longitudes = []
-calc_mean()                                                     # Calculate the mean coordinate of each pair of BSSIDs
-calc_error()                                                    # Calculate distance between GPS and mean coordinate
-calc_chances()                                                  # Calculate the chance a BSSID is not found in database
+    write_combinations_to_file()                                # Write all possible combinations to Excel file
 
-book.save(file)                                                 # Save the data
+    mean_latitudes = []
+    mean_longitudes = []
+
+    calc_mean()                                                 # Calculate the mean coordinate of each pair of BSSIDs
+    calc_error()                                                # Calculate distance between GPS and mean coordinate
+    calc_chances()                                              # Calculate the chance a BSSID is not found in database
+
+    book.save(file)                                             # Save the data
+    print('Sheet saved: BAP' + str(i) + '\n')
 
 
 

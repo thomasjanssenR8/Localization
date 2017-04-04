@@ -12,6 +12,7 @@ def getBSSIDs():
     for row in sheet.iter_rows(min_row=start_row, max_row=end_row, min_col=1, max_col=1):
         for cell in row:
             bssids.append(cell.value)
+    print(bssids)
     return bssids
 
 
@@ -74,28 +75,28 @@ def decodeObject(request):
 
 #  Main program
 # -----------------------------------------------------------------------------------------------------------------
-file = 'bssids.xlsx'                                    # Load Excel sheet
+file = 'data.xlsx'                                          # Load Excel workbook and sheet
 book = openpyxl.load_workbook(filename=file)
-sheet = book.active
-start_row = int(input('Give the starting row index: '))
+sheet = book['raw data + requests']  # book.active
+start_row = int(input('Give the starting row index: '))     # Limit the BSSIDs you want to request
 end_row = int(input('Give the ending row index: '))
 
-bssids = getBSSIDs()                                    # Get the BSSIDs in the vicinity using CMD
+bssids = getBSSIDs()                                        # Get the BSSIDs in the vicinity using CMD
 count = 0
 rowindex = start_row
 
-for bssid in bssids:                                    # Iterate over every BSSID
-    url = createURLwithNetID(bssid)                     # Create URL  with given BSSID (netid)
+for bssid in bssids:                                        # Iterate over every BSSID
+    url = createURLwithNetID(bssid)                         # Create URL  with given BSSID (netid)
     print("Created URL:   " + url)
-    req = request(url)                                  # Perform request
-    coordinate = decodeObject(req)                      # Unmarshalling: find coordinates in json string and print
+    req = request(url)                                      # Perform request
+    coordinate = decodeObject(req)                          # Unmarshalling: find coordinates in json string and print
     if len(coordinate) == 0:
         print("BSSID not found in the Wigle database or daily limit reached.")
-    else:                                               # Write coordinate to excel
+    else:                                                   # Write coordinate to excel
         Eindex = 'E' + str(rowindex)
         Findex = 'F' + str(rowindex)
-        sheet[Eindex] = float(coordinate[0])            # Latitude
-        sheet[Findex] = float(coordinate[1])            # Longitude
+        sheet[Eindex] = float(coordinate[0])                # Latitude
+        sheet[Findex] = float(coordinate[1])                # Longitude
     count += 1
     rowindex += 1
     book.save(file)
