@@ -1,4 +1,5 @@
 import openpyxl
+import gmplot
 from haversine import haversine
 from itertools import combinations
 
@@ -149,6 +150,26 @@ def calc_chances():
     sheet.cell(row=end_row+3, column=8).value = chance_both_not_found
 
 
+def show_map():
+    gmap = gmplot.GoogleMapPlotter(51.212480, 4.414351, 12)     # Create Google Maps map plotter
+
+    map_latitudes = []                                          # Plot heatmap of the found request coordinates
+    map_longitudes = []
+    for lat in latitudes:
+        if lat:
+            map_latitudes.append(lat)
+    for long in longitudes:
+        if long:
+            map_longitudes.append(long)
+    gmap.heatmap(map_latitudes, map_longitudes)
+
+    gps_lat = sheet['J2'].value                                 # Plot the GPS coordinate of the location (black spot)
+    gps_long = sheet['K2'].value
+    gmap.circle(gps_lat, gps_long, 1, "k", ew=2)
+
+    gmap.draw("maps\\BAP" + str(location) + ".html")            # Save the HTML file
+
+
 file = 'data.xlsx'                                              # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
@@ -169,9 +190,13 @@ for location in range(1, 37):                                   # Load a templat
     calc_mean()                                                 # Calculate the mean coordinate of each pair of BSSIDs
     calc_error()                                                # Calculate distance between GPS and mean coordinate
     calc_chances()                                              # Calculate the chance a BSSID is not found in database
+    show_map()                                                  # Save heatmap of requested coordinates
 
     book.save(file)                                             # Save the data
-    print('Sheet saved: BAP' + str(location) + '\n')
+    print('Sheet and map saved: BAP' + str(location) + '\n')
+
+
+
 
 
 
