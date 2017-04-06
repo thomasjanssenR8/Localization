@@ -1,16 +1,14 @@
-import haversine
+import gmplot
 
+latitudes = [51, 51.1, 51.23]
+longitudes = [4, 4.4, 4.6]
 
-def calcError(mean):
-    measuredLatitude = float(input("Give the latitude of the coordinate you measured: "))
-    measuredLongitude = float(input("Give the longitude of the coordinate you measured: "))
-    measurementCoordinate = (measuredLatitude, measuredLongitude)
-    meanCoordinate = (mean[0], mean[1])
-    distance = haversine.haversine(measurementCoordinate, meanCoordinate)
-    print("The distance between the coordinates is " + str(distance) + " km")  # print difference in kilometers
+gmap = gmplot.GoogleMapPlotter(51.215250, 4.411549, 16)
 
+# gmap.plot(latitudes, longitudes, 'cornflowerblue', edge_width=10)
+# gmap.scatter(more_lats, more_lngs, '#3B0B39', size=40, marker=False)
+# gmap.scatter(marker_lats, marker_lngs, 'k', marker=True)
+gmap.heatmap(latitudes, longitudes)
 
-calcError([51.22286987, 4.41602373])
-
-
+gmap.draw("mymap.html")
 

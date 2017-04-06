@@ -107,7 +107,7 @@ def calc_mean():
 
 
 def calc_error():
-    gps_latitude = sheet['J2'].value
+    gps_latitude = sheet['J2'].value                                    # Get GPS coordinate
     gps_longitude = sheet['K2'].value
     gps_coordinate = (gps_latitude, gps_longitude)
 
@@ -118,6 +118,16 @@ def calc_error():
             mean_coordinate = (mean_latitudes[i], mean_longitudes[i])
             distance = haversine(gps_coordinate, mean_coordinate)
             sheet.cell(row=row_index+i, column=10).value = distance
+
+    # Write mean error of all pairs of BSSIDs above the table in column J
+    sum = 0
+    amount = 0
+    for i in range(0, len(bssid_combs)):
+        if sheet.cell(row=row_index+i, column=10).value:
+            sum += sheet.cell(row=row_index+i, column=10).value
+            amount += 1
+    mean_error = float(sum / amount)
+    sheet.cell(row=end_row+3, column=10).value = mean_error
 
 
 def calc_chances():
@@ -142,8 +152,8 @@ def calc_chances():
 file = 'data.xlsx'                                              # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
-for i in range(1, 37):                                          # Load a template sheet for all 36 locations
-    sheet = book.get_sheet_by_name('BAP' + str(i))
+for location in range(1, 37):                                   # Load a template sheet for all 36 locations
+    sheet = book.get_sheet_by_name('BAP' + str(location))
 
     [start_row, end_row, amount_of_bssids, bssids, latitudes, longitudes] = get_data()  # retrieve requested data
 
@@ -161,7 +171,7 @@ for i in range(1, 37):                                          # Load a templat
     calc_chances()                                              # Calculate the chance a BSSID is not found in database
 
     book.save(file)                                             # Save the data
-    print('Sheet saved: BAP' + str(i) + '\n')
+    print('Sheet saved: BAP' + str(location) + '\n')
 
 
 
