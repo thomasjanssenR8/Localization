@@ -41,37 +41,6 @@ def decodeObject(request):
     return coordinate
 
 
-# def calcMean(coord1, coord2):
-#     sum_latitudes = coord1[0] + coord2[0]
-#     sum_longitudes = coord1[1] + coord2[1]
-#     mean_latitude = sum_latitudes / 2  # evt. afronden: round(floatgetal, 8)
-#     mean_longitude = sum_longitudes / 2
-#     print("Mean coordinate: N" + str(mean_latitude) + " E" + str(mean_longitude))
-#     calcedMean = [mean_latitude, mean_longitude]
-#     return calcedMean
-#
-#
-# def calcError(mean):
-#     measuredLatitude = float(input("Give the latitude of the coordinate you measured: "))
-#     measuredLongitude = float(input("Give the longitude of the coordinate you measured: "))
-#     # latitudeError = abs(measuredLatitude - mean[0])
-#     # longitudeError = abs(measuredLongitude - mean[1])
-#     # print("The coordinate error is " + str(latitudeError) + ", " + str(longitudeError))
-#     measurementCoordinate = (measuredLatitude, measuredLongitude)
-#     meanCoordinate = (mean[0], mean[1])
-#     distance = haversine.haversine(measurementCoordinate, meanCoordinate)
-#     print("The distance between the coordinates is " + str(distance) + " km")  # print difference in kilometers
-#     measurement = [measuredLatitude, measuredLongitude, distance]
-#     return measurement
-#
-#
-# def plotCoordinates(coord1, coord2):
-#     plt.scatter(coord1[0], coord1[1])
-#     plt.scatter(coord2[0], coord2[1])
-#     plt.suptitle('Mean coordinate vs. Measured coordinate')
-#     plt.show()
-
-
 
 #  Main program
 # -----------------------------------------------------------------------------------------------------------------
@@ -100,17 +69,7 @@ for bssid in bssids:                                        # Iterate over every
     count += 1
     rowindex += 1
     book.save(file)
-
 # -------------------------------------------------------------------------------------------------------------------
-
-
-
-
-# mean = calcMean(allcoordinates)                               # Calculate the mean position of the coordinates
-# measure = calcError(mean)                                     # Calculate error between measured and real coordinate
-# plotCoordinates(allcoordinates)                               # Plot coordinates in scatter plot
-# writeToFile(mean, measure)                                    # Write results to xlsx file
-
 
 
 
