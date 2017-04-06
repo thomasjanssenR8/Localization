@@ -41,7 +41,6 @@ def decodeObject(request):
     return coordinate
 
 
-
 #  Main program
 # -----------------------------------------------------------------------------------------------------------------
 file = 'data.xlsx'                                          # Load Excel workbook and sheet

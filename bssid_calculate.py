@@ -5,16 +5,14 @@ from itertools import combinations
 
 
 def get_data():
-    start_row = 4                                                                           # Get starting row
-    end_row = 4
-    stop = False                                                                            # Get ending row
-    for row in sheet.iter_rows(min_row=start_row, max_row=sheet.max_row, min_col=1, max_col=1):
-        if not stop:
-            for cell in row:
-                if not cell.value:
-                    stop = True
-                else:
-                    end_row += 1
+    start_row = end_row = 4                                 # Get starting row
+
+    stop = False
+    while not stop:                                         # Get ending row
+        if not sheet.cell(row=end_row, column=1).value:
+            stop = True
+        else:
+            end_row += 1
     end_row -= 1
 
     amount_of_bssids = end_row - start_row + 1
@@ -170,10 +168,12 @@ def show_map():
     gmap.draw("maps\\BAP" + str(location) + ".html")            # Save the HTML file
 
 
+#  Main program
+#  --------------------------------------------------------------------------------------------------------------------
 file = 'data.xlsx'                                              # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
-for location in range(1, 37):                                   # Load a template sheet for all 36 locations
+for location in range(1, 3):                                   # Load a template sheet for all 36 locations
     sheet = book.get_sheet_by_name('BAP' + str(location))
 
     [start_row, end_row, amount_of_bssids, bssids, latitudes, longitudes] = get_data()  # retrieve requested data
@@ -194,7 +194,7 @@ for location in range(1, 37):                                   # Load a templat
 
     book.save(file)                                             # Save the data
     print('Sheet and map saved: BAP' + str(location) + '\n')
-
+# ---------------------------------------------------------------------------------------------------------------------
 
 
 
