@@ -4,22 +4,11 @@ Localization v2: Use BSSID of a network to find coordinates via www.wigle.net an
 """
 
 import requests
-import numpy as np
 import matplotlib.pyplot as plt
 import haversine
 import subprocess
 import csv
 
-
-# @TODO: Aantal request per 24 uur: 1
-# STAPPENPLAN:
-#   - Locatie bepalen + BSSID (en RSS signaal) schrijven naar xlsx (30 locaties)
-#   - Locaties opvragen van BSSIDS op Wigle en locationAPI.org
-#   - Accuracy bepalen en vergelijken
-
-# slechts 1 BSSID per request sturen
-# wat als 1 van de BSSIDs niet gekend is door Wigle? vergelijk met api!
-# document in het Engels?
 
 class Localization:
     userID = ""
