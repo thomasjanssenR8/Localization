@@ -148,7 +148,8 @@ def show_map():
 file = 'data_locationAPI.xlsx'                                  # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
-for location in range(4, 5):                                   # Load a template sheet for all 36 locations
+#  @todo NEVER SORT THE ERROR AND THEN RUN THIS SCRIPT !!!
+for location in range(14, 15):   # 1, 37                                # Load a template sheet for all 36 locations
     sheet = book.get_sheet_by_name('BAP' + str(location))
 
     [bssids, rssis, start_row, end_row, amount_of_bssids] = get_data()  # retrieve collected data
