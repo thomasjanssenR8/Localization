@@ -146,15 +146,15 @@ def show_map():
     gps_long = sheet['K2'].value
     gmap.circle(gps_lat, gps_long, 1, "k", ew=2)
 
-    gmap.draw("maps\\BAP" + str(location) + ".html")            # Save the HTML file
+    gmap.draw("maps_wigle\\BAP" + str(location) + ".html")            # Save the HTML file
 
 
 #  Main program
 #  --------------------------------------------------------------------------------------------------------------------
-file = 'data.xlsx'                                              # Load Excel sheet of a location (e.g. BAP1)
+file = 'data_wigle.xlsx'                                              # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
-for location in range(1, 2):                                   # Load a template sheet for all 36 locations
+for location in range(1, 37):                                   # Load a template sheet for all 36 locations
     sheet = book.get_sheet_by_name('BAP' + str(location))
 
     [start_row, end_row, amount_of_bssids, bssids, latitudes, longitudes] = get_data()  # retrieve requested data

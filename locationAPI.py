@@ -1,6 +1,8 @@
 from itertools import combinations
 import openpyxl
 import unwiredlabs
+from gmplot import gmplot
+from haversine import haversine
 
 
 def get_data():
@@ -44,28 +46,20 @@ def write_combinations_to_file():
 
     row_index = end_row + 8
 
-    for i in range(0, len(bssid_combs)):                                    # Write combination number in column A
-        sheet.cell(row=row_index + i, column=1).value = i + 1
-
-    for i in range(0, len(bssid_combs)):                                    # Write BSSID 1 in column B
-        sheet.cell(row=row_index + i, column=2).value = bssid_combs[i][0]
-
-    for i in range(0, len(bssid_combs)):                                    # Write RSSI 1 in column C
-        sheet.cell(row=row_index + i, column=3).value = rssi_combs[i][0]
-
-    for i in range(0, len(bssid_combs)):                                    # Write BSSID 2 in column D
-        sheet.cell(row=row_index + i, column=4).value = bssid_combs[i][1]
-
-    for i in range(0, len(bssid_combs)):                                    # Write RSSI 2 in column E
-        sheet.cell(row=row_index + i, column=5).value = rssi_combs[i][1]
+    for i in range(0, len(bssid_combs)):
+        sheet.cell(row=row_index + i, column=1).value = i + 1               # Write combination number in column A
+        sheet.cell(row=row_index + i, column=2).value = bssid_combs[i][0]   # Write BSSID 1 in column B
+        sheet.cell(row=row_index + i, column=3).value = rssi_combs[i][0]    # Write RSSI 1 in column C
+        sheet.cell(row=row_index + i, column=4).value = bssid_combs[i][1]   # Write BSSID 2 in column D
+        sheet.cell(row=row_index + i, column=5).value = rssi_combs[i][1]    # Write RSSI 2 in column E
 
 
 def perform_request_of_combinations():
     row_index = end_row + 8
     for j in range(0, len(bssid_combs)):
         request = unwiredlabs.UnwiredRequest()
-        request.addAccessPoint(bssid_combs[j][0], rssi_combs[j][0])         # Add AP1
-        request.addAccessPoint(bssid_combs[j][1], rssi_combs[j][1])         # Add AP2
+        request.addAccessPoint(bssid_combs[j][0], rssi_combs[j][0])         # Add first AP
+        request.addAccessPoint(bssid_combs[j][1], rssi_combs[j][1])         # Add second AP
         connection = unwiredlabs.UnwiredConnection(key='99c1d8b93a7f37')    # API key of account 'Thomas Janssen'
         response = connection.performRequest(request)                       # Perform request
 
@@ -74,8 +68,76 @@ def perform_request_of_combinations():
         else:
             print('Response: ', response.data)
             sheet.cell(row=row_index+j, column=6).value = response.lat      # Write mean latitude of 2 BSSIDs in col F
-            sheet.cell(row=row_index+j, column=7).value = response.lon      # Wirte mean longitude of 2 BSSIDs in col G
+            sheet.cell(row=row_index+j, column=7).value = response.lon      # Write mean longitude of 2 BSSIDs in col G
             sheet.cell(row=row_index+j, column=8).value = response.data['accuracy']  # Write accuracy (in m) in col H
+            mean_latitudes.append(response.lat)
+            mean_longitudes.append(response.lon)
+            accuracies.append(response.data['accuracy'])
+
+
+def calc_error():
+    gps_latitude = sheet['H2'].value                        # Get GPS coordinate
+    gps_longitude = sheet['I2'].value
+    gps_coordinate = (gps_latitude, gps_longitude)
+
+    # Write error in column I, using the haversine function
+    row_index = end_row + 8
+    for m in range(0, len(bssid_combs)):
+        if mean_latitudes[m] and mean_longitudes[m]:  # if there is a mean, calculate the error
+            mean_coordinate = (mean_latitudes[m], mean_longitudes[m])
+            distance = haversine(gps_coordinate, mean_coordinate)
+            sheet.cell(row=row_index+m, column=9).value = distance
+
+    # Write mean error of all pairs of BSSIDs above the table in column D
+    sum = 0
+    amount = 0
+    for m in range(0, len(bssid_combs)):
+        if sheet.cell(row=row_index+m, column=9).value:
+            sum += sheet.cell(row=row_index+m, column=9).value
+            amount += 1
+    mean_error = float(sum / amount)
+    sheet.cell(row=end_row+5, column=4).value = mean_error
+
+    # Calculate the mean accuracy of all combinations of 2 BSSIDs and write it to Excel
+    sum = 0
+    amount = 0
+    for m in range(0, len(bssid_combs)):
+        if sheet.cell(row=row_index+m, column=8).value:
+            sum += sheet.cell(row=row_index+m, column=8).value
+            amount += 1
+    mean_accuracy = float(sum/amount)
+    sheet.cell(row=end_row+4, column=4).value = mean_accuracy
+
+
+def calc_chance():
+    both_not_found = 0
+    for i in range(0, len(bssid_combs)):
+        if not mean_latitudes[i][0] and not mean_latitudes[i][1]:
+            both_not_found += 1
+    chance_both_not_found = float(both_not_found / len(bssid_combs) * 100)  # percentage both BSSIDs in a pair not found
+    print('The chance of having of pair of BSSIDs both not found in the database is %.2f %%' % chance_both_not_found)
+
+    sheet.cell(row=end_row+3, column=8).value = chance_both_not_found       # write chance of no match to Excel
+
+
+def show_map():
+    gmap = gmplot.GoogleMapPlotter(51.212480, 4.414351, 12)     # Create Google Maps map plotter
+
+    map_latitudes = []                                          # Plot heatmap of mean coordinates of a combination
+    map_longitudes = []
+    for lat in mean_latitudes:
+        if lat:
+            map_latitudes.append(lat)
+    for long in mean_longitudes:
+        if long:
+            map_longitudes.append(long)
+    gmap.heatmap(map_latitudes, map_longitudes)
+
+    gps_lat = sheet['H2'].value                                 # Plot the GPS coordinate of the location (black spot)
+    gps_long = sheet['I2'].value
+    gmap.circle(gps_lat, gps_long, 1, "k", ew=2)
+
+    gmap.draw("maps_locationAPI\\BAP" + str(location) + ".html")            # Save the HTML file
 
 
 
@@ -98,14 +160,11 @@ for location in range(1, 2):                                   # Load a template
     mean_longitudes = []
     accuracies = []
 
-    # perform_request_of_combinations()
+    perform_request_of_combinations()                           # Request the mean coordinate of each pair of BSSIDs
 
-    # print(mean_latitudes)
-    # print(mean_longitudes)
-    # calc_mean()                                                 # Calculate the mean coordinate of each pair of BSSIDs
-    # calc_error()                                                # Calculate distance between GPS and mean coordinate
-    # calc_chances()                                              # Calculate the chance a BSSID is not found in database
-    # show_map()                                                  # Save heatmap of requested coordinates
+    calc_error()                                                # Calculate distance between GPS and mean coordinate
+    calc_chance()                                               # Calculate the chance of no match in a combination
+    show_map()                                                  # Save heatmap of requested coordinates
 
     book.save(file)                                             # Save the data
     print('Sheet and map saved: BAP' + str(location) + '\n')

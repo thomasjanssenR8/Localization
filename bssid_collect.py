@@ -28,12 +28,13 @@ measuredLongitude = float(input("Give the longitude of the coordinate you measur
 
 
 # Save data to Excel sheet
-file = 'bssids.xlsx'
+file = 'data_wigle.xlsx'
 book = openpyxl.load_workbook(filename=file)
 sheet = book.active
 
 count = 0
 rowindex = sheet.max_row + 2
+
 while count < len(bssids):
     Aindex = 'A' + str(rowindex)
     Bindex = 'B' + str(rowindex)
