@@ -44,33 +44,14 @@ def write_combinations_to_file():
 
     row_index = end_row + 6
 
-    # Write combination number in column A
     for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=1).value = i+1
-
-    # Write BSSID 1 in column B
-    for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=2).value = bssid_combs[i][0]
-
-    # Write BSSID 2 in column C
-    for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=3).value = bssid_combs[i][1]
-
-    # Write latitude of BSSID 1 in column D
-    for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=4).value = lat_combs[i][0]
-
-    # Write longitude of BSSID 1 in column E
-    for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=5).value = long_combs[i][0]
-
-    # Write latitude of BSSID 2 in column F
-    for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=6).value = lat_combs[i][1]
-
-    # Write longitude of BSSID 2 in column G
-    for i in range(0, len(bssid_combs)):
-        sheet.cell(row=row_index+i, column=7).value = long_combs[i][1]
+        sheet.cell(row=row_index + i, column=1).value = i + 1               # Write combination number in column A
+        sheet.cell(row=row_index + i, column=2).value = bssid_combs[i][0]   # Write BSSID 1 in column B
+        sheet.cell(row=row_index + i, column=3).value = bssid_combs[i][1]   # Write BSSID 2 in column C
+        sheet.cell(row=row_index + i, column=4).value = lat_combs[i][0]     # Write latitude of BSSID 1 in column D
+        sheet.cell(row=row_index + i, column=5).value = long_combs[i][0]    # Write longitude of BSSID 1 in column E
+        sheet.cell(row=row_index + i, column=6).value = lat_combs[i][1]     # Write latitude of BSSID 2 in column F
+        sheet.cell(row=row_index + i, column=7).value = long_combs[i][1]    # Write longitude of BSSID 2 in column G
 
 
 def calc_mean():
@@ -173,7 +154,7 @@ def show_map():
 file = 'data.xlsx'                                              # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
-for location in range(1, 37):                                   # Load a template sheet for all 36 locations
+for location in range(1, 2):                                   # Load a template sheet for all 36 locations
     sheet = book.get_sheet_by_name('BAP' + str(location))
 
     [start_row, end_row, amount_of_bssids, bssids, latitudes, longitudes] = get_data()  # retrieve requested data

@@ -39,36 +39,29 @@ def get_data():
 
 
 def write_combinations_to_file():
-
-    # Write amount of BSSIDS and combinations under the first table
-    sheet.cell(row=end_row+2, column=4).value = amount_of_bssids
-    sheet.cell(row=end_row+3, column=4).value = len(bssid_combs)
+    sheet.cell(row=end_row+2, column=4).value = amount_of_bssids            # Write amount of BSSIDS and combinations
+    sheet.cell(row=end_row+3, column=4).value = len(bssid_combs)            # under the first table
 
     row_index = end_row + 8
 
-    # Write combination number in column A
-    for i in range(0, len(bssid_combs)):
+    for i in range(0, len(bssid_combs)):                                    # Write combination number in column A
         sheet.cell(row=row_index + i, column=1).value = i + 1
 
-    # Write BSSID 1 in column B
-    for i in range(0, len(bssid_combs)):
+    for i in range(0, len(bssid_combs)):                                    # Write BSSID 1 in column B
         sheet.cell(row=row_index + i, column=2).value = bssid_combs[i][0]
 
-    # Write RSSI 1 in column C
-    for i in range(0, len(bssid_combs)):
+    for i in range(0, len(bssid_combs)):                                    # Write RSSI 1 in column C
         sheet.cell(row=row_index + i, column=3).value = rssi_combs[i][0]
 
-    # Write BSSID 2 in column D
-    for i in range(0, len(bssid_combs)):
+    for i in range(0, len(bssid_combs)):                                    # Write BSSID 2 in column D
         sheet.cell(row=row_index + i, column=4).value = bssid_combs[i][1]
 
-    # Write RSSI 2 in column E
-    for i in range(0, len(bssid_combs)):
+    for i in range(0, len(bssid_combs)):                                    # Write RSSI 2 in column E
         sheet.cell(row=row_index + i, column=5).value = rssi_combs[i][1]
 
 
 def perform_request_of_combinations():
-
+    row_index = end_row + 8
     for j in range(0, len(bssid_combs)):
         request = unwiredlabs.UnwiredRequest()
         request.addAccessPoint(bssid_combs[j][0], rssi_combs[j][0])         # Add AP1
@@ -80,9 +73,9 @@ def perform_request_of_combinations():
             print('Error:', response.status)
         else:
             print('Response: ', response.data)
-            sheet.cell(row=end_row + 4, column=4).value = response.lat      # Write mean latitude of 2 BSSIDs
-            sheet.cell(row=end_row + 5, column=4).value = response.lon      # Wirte mean longitude of 2 BSSIDs
-            sheet.cell(row=end_row + 6, column=4).value = response.data['accuracy']  # Write accuracy (in meter)
+            sheet.cell(row=row_index+j, column=6).value = response.lat      # Write mean latitude of 2 BSSIDs in col F
+            sheet.cell(row=row_index+j, column=7).value = response.lon      # Wirte mean longitude of 2 BSSIDs in col G
+            sheet.cell(row=row_index+j, column=8).value = response.data['accuracy']  # Write accuracy (in m) in col H
 
 
 
