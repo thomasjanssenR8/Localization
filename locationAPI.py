@@ -44,7 +44,7 @@ def write_combinations_to_file():
     sheet.cell(row=end_row+2, column=4).value = amount_of_bssids            # Write amount of BSSIDS and combinations
     sheet.cell(row=end_row+3, column=4).value = len(bssid_combs)            # under the first table
 
-    row_index = end_row + 8
+    row_index = end_row + 9
 
     for i in range(0, len(bssid_combs)):
         sheet.cell(row=row_index + i, column=1).value = i + 1               # Write combination number in column A
@@ -55,7 +55,7 @@ def write_combinations_to_file():
 
 
 def perform_request_of_combinations():
-    row_index = end_row + 8
+    row_index = end_row + 9
     for j in range(0, len(bssid_combs)):
         request = unwiredlabs.UnwiredRequest()
         request.addAccessPoint(bssid_combs[j][0], rssi_combs[j][0])         # Add first AP
@@ -64,15 +64,18 @@ def perform_request_of_combinations():
         response = connection.performRequest(request)                       # Perform request
 
         if response.status != 'Ok':
-            print('Error:', response.status)
+            print(j+1, 'Error:', response.status)
+            mean_latitudes.append(None)  # no matches found
+            mean_longitudes.append(None)
         else:
-            print('Response: ', response.data)
+            print(j+1, 'Response: ', response.data)
             sheet.cell(row=row_index+j, column=6).value = response.lat      # Write mean latitude of 2 BSSIDs in col F
             sheet.cell(row=row_index+j, column=7).value = response.lon      # Write mean longitude of 2 BSSIDs in col G
             sheet.cell(row=row_index+j, column=8).value = response.data['accuracy']  # Write accuracy (in m) in col H
             mean_latitudes.append(response.lat)
             mean_longitudes.append(response.lon)
             accuracies.append(response.data['accuracy'])
+        book.save(file)  # save file after each line! (in case of socket error -> data saved!)
 
 
 def calc_error():
@@ -81,7 +84,7 @@ def calc_error():
     gps_coordinate = (gps_latitude, gps_longitude)
 
     # Write error in column I, using the haversine function
-    row_index = end_row + 8
+    row_index = end_row + 9
     for m in range(0, len(bssid_combs)):
         if mean_latitudes[m] and mean_longitudes[m]:  # if there is a mean, calculate the error
             mean_coordinate = (mean_latitudes[m], mean_longitudes[m])
@@ -112,12 +115,11 @@ def calc_error():
 def calc_chance():
     both_not_found = 0
     for i in range(0, len(bssid_combs)):
-        if not mean_latitudes[i][0] and not mean_latitudes[i][1]:
+        if not mean_latitudes[i] and not mean_longitudes[i]:
             both_not_found += 1
     chance_both_not_found = float(both_not_found / len(bssid_combs) * 100)  # percentage both BSSIDs in a pair not found
     print('The chance of having of pair of BSSIDs both not found in the database is %.2f %%' % chance_both_not_found)
-
-    sheet.cell(row=end_row+3, column=8).value = chance_both_not_found       # write chance of no match to Excel
+    sheet.cell(row=end_row+6, column=4).value = chance_both_not_found       # write chance of no match to Excel
 
 
 def show_map():
@@ -146,7 +148,7 @@ def show_map():
 file = 'data_locationAPI.xlsx'                                  # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
-for location in range(1, 2):                                   # Load a template sheet for all 36 locations
+for location in range(4, 5):                                   # Load a template sheet for all 36 locations
     sheet = book.get_sheet_by_name('BAP' + str(location))
 
     [bssids, rssis, start_row, end_row, amount_of_bssids] = get_data()  # retrieve collected data
