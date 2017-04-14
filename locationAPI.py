@@ -41,10 +41,10 @@ def get_data():
 def write_combinations_to_file():
 
     # Write amount of BSSIDS and combinations under the first table
-    sheet.cell(row=end_row + 2, column=4).value = amount_of_bssids
-    sheet.cell(row=end_row + 3, column=4).value = len(bssid_combs)
+    sheet.cell(row=end_row+2, column=4).value = amount_of_bssids
+    sheet.cell(row=end_row+3, column=4).value = len(bssid_combs)
 
-    row_index = end_row + 9
+    row_index = end_row + 8
 
     # Write combination number in column A
     for i in range(0, len(bssid_combs)):
@@ -67,17 +67,23 @@ def write_combinations_to_file():
         sheet.cell(row=row_index + i, column=5).value = rssi_combs[i][1]
 
 
-def perform_request(bssid1, bssid2, rssi1, rssi2):
-    request = unwiredlabs.UnwiredRequest()
-    request.addAccessPoint(bssid1, rssi1)
-    request.addAccessPoint(bssid2, rssi2)
-    connection = unwiredlabs.UnwiredConnection(key='99c1d8b93a7f37')  # API key of account 'Thomas Janssen'
-    response = connection.performRequest(request)
+def perform_request_of_combinations():
 
-    if response.status != 'Ok':
+    for j in range(0, len(bssid_combs)):
+        request = unwiredlabs.UnwiredRequest()
+        request.addAccessPoint(bssid_combs[j][0], rssi_combs[j][0])         # Add AP1
+        request.addAccessPoint(bssid_combs[j][1], rssi_combs[j][1])         # Add AP2
+        connection = unwiredlabs.UnwiredConnection(key='99c1d8b93a7f37')    # API key of account 'Thomas Janssen'
+        response = connection.performRequest(request)                       # Perform request
+
+        if response.status != 'Ok':
             print('Error:', response.status)
-    else:
-            print('Response: ', response.coordinate)
+        else:
+            print('Response: ', response.data)
+            sheet.cell(row=end_row + 4, column=4).value = response.lat      # Write mean latitude of 2 BSSIDs
+            sheet.cell(row=end_row + 5, column=4).value = response.lon      # Wirte mean longitude of 2 BSSIDs
+            sheet.cell(row=end_row + 6, column=4).value = response.data['accuracy']  # Write accuracy (in meter)
+
 
 
 #  Main program
@@ -88,16 +94,21 @@ book = openpyxl.load_workbook(filename=file)
 for location in range(1, 2):                                   # Load a template sheet for all 36 locations
     sheet = book.get_sheet_by_name('BAP' + str(location))
 
-    [bssids, rssis, start_row, end_row, amount_of_bssids] = get_data()  # retrieve requested data
+    [bssids, rssis, start_row, end_row, amount_of_bssids] = get_data()  # retrieve collected data
 
     bssid_combs = list(combinations(bssids, 2))                 # Get all possible combinations of 2 BSSIDs
     rssi_combs = list(combinations(rssis, 2))                   # Get all the combinations of the 2 RSSIs (in dBm)
 
     write_combinations_to_file()                                # Write all possible combinations to Excel file
 
-    # mean_latitudes = []
-    # mean_longitudes = []
-    #
+    mean_latitudes = []
+    mean_longitudes = []
+    accuracies = []
+
+    # perform_request_of_combinations()
+
+    # print(mean_latitudes)
+    # print(mean_longitudes)
     # calc_mean()                                                 # Calculate the mean coordinate of each pair of BSSIDs
     # calc_error()                                                # Calculate distance between GPS and mean coordinate
     # calc_chances()                                              # Calculate the chance a BSSID is not found in database
@@ -108,5 +119,3 @@ for location in range(1, 2):                                   # Load a template
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-# [bssid1, bssid2, rssi1, rssi2] = get_data()
-# perform_request(bssid1, bssid2, rssi1, rssi2)
