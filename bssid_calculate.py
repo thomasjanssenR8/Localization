@@ -42,7 +42,7 @@ def write_combinations_to_file():
     sheet.cell(row=end_row + 2, column=3).value = amount_of_bssids
     sheet.cell(row=end_row + 3, column=3).value = len(bssid_combs)
 
-    row_index = end_row + 6
+    row_index = end_row + 10
 
     for i in range(0, len(bssid_combs)):
         sheet.cell(row=row_index + i, column=1).value = i + 1               # Write combination number in column A
@@ -56,7 +56,7 @@ def write_combinations_to_file():
 
 def calc_mean():
     # Write mean latitude of the 2 BSSIDs in column H
-    row_index = end_row + 6
+    row_index = end_row + 10
     for i in range(0, len(bssid_combs)):
         if not lat_combs[i][0] and not lat_combs[i][1]:  # both BSSIDs were not found in database
             mean_latitude = None
@@ -71,7 +71,7 @@ def calc_mean():
         mean_latitudes.append(mean_latitude)
 
     # Write mean longitude of the 2 BSSIDs in column I
-    row_index = end_row + 6
+    row_index = end_row + 10
     for i in range(0, len(bssid_combs)):
         if not long_combs[i][0] and not long_combs[i][1]:   # both BSSIDs were not found in database
             mean_longitude = None
@@ -92,7 +92,7 @@ def calc_error():
     gps_coordinate = (gps_latitude, gps_longitude)
 
     # Write error in column J, using the haversine function
-    row_index = end_row + 6
+    row_index = end_row + 10
     for i in range(0, len(bssid_combs)):
         if mean_latitudes[i] and mean_longitudes[i]:                    # if there is a mean, calculate the error
             mean_coordinate = (mean_latitudes[i], mean_longitudes[i])
