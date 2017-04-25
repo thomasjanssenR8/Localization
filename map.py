@@ -5,14 +5,16 @@ Plot a map with Antwerp in the center. The radius of each circle represents the 
 import openpyxl
 import gmplot
 
-errors = []
+errors_wigle = []
+errors_locationAPI = []
 gps_latitudes = []
 gps_longitudes = []
 
 book1 = openpyxl.load_workbook(filename='data_comparison.xlsx')     # Load Excel sheet with all location errors
 sheet1 = book1.get_sheet_by_name('Mean + median errors')
 for i in range(2, 38):
-    errors.append(sheet1.cell(row=i, column=4).value)
+    errors_wigle.append(sheet1.cell(row=i, column=4).value)         # Load WiGLE and locationAPI errors
+    errors_locationAPI.append(sheet1.cell(row=i, column=5).value)
 
 book2 = openpyxl.load_workbook(filename='data_wigle.xlsx')          # Load GPS coordinates of each location
 for i in range(1, 37):
@@ -21,6 +23,11 @@ for i in range(1, 37):
     gps_longitudes.append(sheet2['K2'].value)
 
 gmap = gmplot.GoogleMapPlotter(51.212480, 4.414351, 12)             # Create Google Maps map plotter
-for i in range(0, len(errors)):
-    gmap.circle(gps_latitudes[i], gps_longitudes[i], errors[i]*1000, "r", ew=2)
-gmap.draw("maps_wigle\\BAP_error_map.html")                         # Save the HTML file
+
+for i in range(0, len(errors_wigle)):                               # Plot WiGLE circles in blue
+    gmap.circle(gps_latitudes[i], gps_longitudes[i], errors_wigle[i]*1000, "blue", ew=2)
+for i in range(0, len(errors_locationAPI)):                         # Plot LocationAPI circles in orange
+    gmap.circle(gps_latitudes[i], gps_longitudes[i], errors_locationAPI[i]*1000, "orange", ew=2)
+
+gmap.draw("BAP_median_errors_comparison.html")                      # Save HTML file
+
