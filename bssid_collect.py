@@ -28,7 +28,7 @@ measuredLongitude = float(input("Give the longitude of the coordinate you measur
 
 
 # Save data to Excel sheet
-file = 'data_wigle.xlsx'
+file = 'data\\data_wigle.xlsx'
 book = openpyxl.load_workbook(filename=file)
 sheet = book.active
 

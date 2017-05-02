@@ -10,13 +10,13 @@ errors_locationAPI = []
 gps_latitudes = []
 gps_longitudes = []
 
-book1 = openpyxl.load_workbook(filename='data_comparison.xlsx')     # Load Excel sheet with all location errors
+book1 = openpyxl.load_workbook(filename='data\\data_comparison.xlsx')     # Load Excel sheet with all location errors
 sheet1 = book1.get_sheet_by_name('Mean + median errors')
 for i in range(2, 38):
     errors_wigle.append(sheet1.cell(row=i, column=4).value)         # Load WiGLE and locationAPI errors
     errors_locationAPI.append(sheet1.cell(row=i, column=5).value)
 
-book2 = openpyxl.load_workbook(filename='data_wigle.xlsx')          # Load GPS coordinates of each location
+book2 = openpyxl.load_workbook(filename='data\\data_wigle.xlsx')          # Load GPS coordinates of each location
 for i in range(1, 37):
     sheet2 = book2.get_sheet_by_name('BAP'+str(i))
     gps_latitudes.append(sheet2['J2'].value)
@@ -29,5 +29,5 @@ for i in range(0, len(errors_wigle)):                               # Plot WiGLE
 for i in range(0, len(errors_locationAPI)):                         # Plot LocationAPI circles in orange
     gmap.circle(gps_latitudes[i], gps_longitudes[i], errors_locationAPI[i]*1000, "orange", ew=2)
 
-gmap.draw("BAP_median_errors_comparison.html")                      # Save HTML file
+gmap.draw("maps\\BAP_median_errors_comparison.html")                      # Save HTML file
 

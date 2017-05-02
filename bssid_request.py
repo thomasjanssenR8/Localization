@@ -43,7 +43,7 @@ def decodeObject(request):
 
 #  Main program
 # -----------------------------------------------------------------------------------------------------------------
-file = 'data_wigle.xlsx'                                    # Load Excel workbook and sheet
+file = 'data\\data_wigle.xlsx'                                    # Load Excel workbook and sheet
 book = openpyxl.load_workbook(filename=file)
 sheet = book['raw data + requests']  # book.active
 start_row = int(input('Give the starting row index: '))     # Limit the BSSIDs you want to request
