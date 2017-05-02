@@ -29,5 +29,5 @@ for i in range(0, len(errors_wigle)):                               # Plot WiGLE
 for i in range(0, len(errors_locationAPI)):                         # Plot LocationAPI circles in orange
     gmap.circle(gps_latitudes[i], gps_longitudes[i], errors_locationAPI[i]*1000, "orange", ew=2)
 
-gmap.draw("maps\\BAP_median_errors_comparison.html")                      # Save HTML file
+gmap.draw("maps\\maps_comparison\\BAP_median_errors_comparison.html")                      # Save HTML file
 
