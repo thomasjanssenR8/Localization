@@ -44,7 +44,7 @@ def write_combinations_to_file():
     sheet.cell(row=end_row+2, column=4).value = amount_of_bssids            # Write amount of BSSIDS and combinations
     sheet.cell(row=end_row+3, column=4).value = len(bssid_combs)            # under the first table
 
-    row_index = end_row + 9
+    row_index = end_row + 10
 
     for i in range(0, len(bssid_combs)):
         sheet.cell(row=row_index + i, column=1).value = i + 1               # Write combination number in column A
@@ -55,7 +55,7 @@ def write_combinations_to_file():
 
 
 def perform_request_of_combinations():
-    row_index = end_row + 9
+    row_index = end_row + 10
     for j in range(0, len(bssid_combs)):
         request = unwiredlabs.UnwiredRequest()
         request.addAccessPoint(bssid_combs[j][0], rssi_combs[j][0])         # Add first AP
@@ -84,7 +84,7 @@ def calc_error():
     gps_coordinate = (gps_latitude, gps_longitude)
 
     # Write error in column I, using the haversine function
-    row_index = end_row + 9
+    row_index = end_row + 10
     for m in range(0, len(bssid_combs)):
         if mean_latitudes[m] and mean_longitudes[m]:  # if there is a mean, calculate the error
             mean_coordinate = (mean_latitudes[m], mean_longitudes[m])
