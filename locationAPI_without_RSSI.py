@@ -129,10 +129,10 @@ def show_map():
 
 #  Main program
 #  --------------------------------------------------------------------------------------------------------------------
-file = 'data\\data_locationAPI_without_RSSI.xlsx'                                  # Load Excel sheet of a location (e.g. BAP1)
+file = 'data\\data_locationAPI_without_RSSI.xlsx'               # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
-for location in range(1, 2):   # (1, 37)                                # Load a template sheet for all 36 locations
+for location in range(1, 37):   # (1, 37)                       # Load a template sheet for all 36 locations
     sheet = book.get_sheet_by_name('BAP' + str(location))
 
     [bssids, start_row, end_row, amount_of_bssids] = get_data()  # Retrieve collected data
