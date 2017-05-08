@@ -1,33 +1,3 @@
-import unwiredlabs
-
-
-def perform_request():
-    request = unwiredlabs.UnwiredRequest()
-    # request.addAccessPoint("06:35:3b:f8:e0:6f", 61)  # 4
-    # request.addAccessPoint("06:35:3b:4b:88:28", 35)  # 6
-    # request.addAccessPoint("6a:15:90:0c:74:15", 56)  # 21
-    # request.addAccessPoint("68:15:90:0c:74:14", 56)  # 26
-    request.addAccessPoint("64:a5:c3:64:f1:28", "unknown")  # 30
-    request.addAccessPoint("5c:35:3b:f8:e0:6c", "unknown")  # 33
-
-    connection = unwiredlabs.UnwiredConnection(key='99c1d8b93a7f37')  # API key of account 'Thomas Janssen'
-    response = connection.performRequest(request)
-
-    if response.status != 'Ok':
-        print('Error:', response.status)
-    else:
-        print('Response: ', response.data)
-        print(response.data["accuracy"])
-        print('Balance = ', response.balance)
-
-
-perform_request()
-
-
-
-
-
-
 
 
 # import gmplot
