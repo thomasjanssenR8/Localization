@@ -1,7 +1,7 @@
 import openpyxl
 
 
-def get_data():
+def read_data():
     start_row = end_row = 4                                 # Get starting row of BSSIDs
     stop = False
     while not stop:                                         # Get ending row of BSSIDs
@@ -31,30 +31,40 @@ def get_data():
     return read_data
 
 
-book_read = openpyxl.load_workbook(filename='data\\data_wigle.xlsx')  # Load Excel sheets
+def write_error():
+    for row in range(begin_combs, end_combs+1):
+        if sheet.cell(row=row, column=2).value is bssid1 and sheet.cell(row=row, column=3).value is bssid2 \
+                or sheet.cell(row=row, column=2).value is bssid2 and sheet.cell(row=row, column=3).value is bssid1:
+            error = sheet.cell(row=row, column=10).value
+            if error is None:
+                error = "No match"
+            sheet_write.cell(row=location+1, column=2).value = error
+
+
+book_read = openpyxl.load_workbook(filename='data\\data_wigle.xlsx')    # Load Excel sheets
 book_write = openpyxl.load_workbook(filename='data\\data_comparison.xlsx')
 sheet_write = book_write.get_sheet_by_name('Highest RSSI')
 
-for location in range(1, 2):                                       # Load a template sheet for all 36 locations
+for location in range(1, 37):                                            # Load a template sheet for all 36 locations
     sheet = book_read.get_sheet_by_name('BAP' + str(location))
 
-    [start_row, end_row, rssis, begin_combs, end_combs, errors] = get_data()   # Read combination errors
-    print(errors)
-    print(rssis)
+    [start_row, end_row, rssis, begin_combs, end_combs, errors] = read_data()  # Read combination errors
 
-    rssi_max1 = max(rssis)                                          # Find 2 BSSIDs with highest RSSI values
-    bssid_max1 = rssis.index(rssi_max1)
-    rssis.remove(rssi_max1)
-    rssi_max2 = max(rssis)
-    bssid_max2 = rssis.index(rssi_max2)
-    print(rssi_max1, rssi_max2)
-    print(bssid_max1, bssid_max2)
+    index_max1 = rssis.index(max(rssis))                                # Find rows of data with 2 highest RSSI values
+    rssis.remove(max(rssis))
+    index_max2 = rssis.index(max(rssis))
+    if index_max2 > index_max1:
+        index_max2 += 1
+    index_max1 += 4
+    index_max2 += 4
 
-    # for row in range(start_row, end_row+1):
-    #     if sheet.cell(row=row, column=)
+    bssid1 = sheet.cell(row=index_max1, column=1).value                 # Find 2 BSSIDs with highest RSSI values
+    bssid2 = sheet.cell(row=index_max2, column=1).value
 
-    #book_write.save('data\\data_comparison.xlsx')
-    #print('BAP' + str(location) + ' saved.\n')
+    write_error()                                    # Write error of combination with the 2 BSSIDs to comparsion table
+
+    book_write.save('data\\data_comparison.xlsx')                       # Save output file
+    print('BAP' + str(location) + ' saved.\n')
 
 
 
