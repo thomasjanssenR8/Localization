@@ -151,7 +151,7 @@ def show_map():
 
 #  Main program
 #  --------------------------------------------------------------------------------------------------------------------
-file = 'data\\data_wigle.xlsx'                                        # Load Excel sheet of a location (e.g. BAP1)
+file = 'data\\data_wigle.xlsx'                                  # Load Excel sheet of a location (e.g. BAP1)
 book = openpyxl.load_workbook(filename=file)
 
 for location in range(1, 37):                                   # Load a template sheet for all 36 locations

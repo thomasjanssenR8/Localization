@@ -23,7 +23,7 @@ def createURLwithNetID(netid):
 
 def request(url):
     r = requests.get(url, auth=('AID6e6e0f71da38f4b56d8c5990b0a540f1',  # Authentication:
-                                '848f760ac689e986a7f14120c014124d'))    # API name + API token from Wigle.net account ThomasJanssen
+                                '848f760ac689e986a7f14120c014124d'))    # API name + API token from Wigle.net account TODO: PLEASE CHANGE
     print(r.text)  # print string
     return r
 
@@ -43,7 +43,7 @@ def decodeObject(request):
 
 #  Main program
 # -----------------------------------------------------------------------------------------------------------------
-file = 'data\\data_wigle.xlsx'                                    # Load Excel workbook and sheet
+file = 'data\\data_wigle.xlsx'                              # Load Excel workbook and sheet
 book = openpyxl.load_workbook(filename=file)
 sheet = book['raw data + requests']  # book.active
 start_row = int(input('Give the starting row index: '))     # Limit the BSSIDs you want to request

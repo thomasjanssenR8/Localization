@@ -61,7 +61,7 @@ class Localization:
 
     def request(self, url):
         r = requests.get(url, auth=('AID6e6e0f71da38f4b56d8c5990b0a540f1',  # Authentication:
-                                    '848f760ac689e986a7f14120c014124d'))    # API name + API token from Wigle.net account ThomasJanssen
+                                    '848f760ac689e986a7f14120c014124d'))    # API name + API token from Wigle.net account TODO: PLEASE CHANGE!
         print(r.text)  # print string
         return r
 
